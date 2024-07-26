@@ -29,7 +29,7 @@ const limiter = (0, express_rate_limit_1.rateLimit)({
     legacyHeaders: false,
 });
 // routes
-exports.app.use("/api/v1", user_route_1.default);
+exports.app.use("/api", user_route_1.default);
 // testing api
 exports.app.get("/test", (req, res, next) => {
     res.status(200).json({
