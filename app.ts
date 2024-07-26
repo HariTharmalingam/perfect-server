@@ -31,7 +31,7 @@ const limiter = rateLimit({
 
 // routes
 app.use(
-  "/api/v1",
+  "/api",
   userRouter
 );
 
