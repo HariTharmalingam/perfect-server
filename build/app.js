@@ -18,8 +18,8 @@ exports.app.use(express_1.default.json({ limit: "50mb" }));
 exports.app.use((0, cookie_parser_1.default)());
 // cors => cross origin resource sharing
 exports.app.use((0, cors_1.default)({
-    origin: ["http://localhost:8000"],
-    // credentials: true,
+    origin: process.env.ORIGIN,
+    credentials: true,
 }));
 // api requests limit
 const limiter = (0, express_rate_limit_1.rateLimit)({
@@ -30,13 +30,14 @@ const limiter = (0, express_rate_limit_1.rateLimit)({
 });
 // routes
 exports.app.use("/api", user_route_1.default);
+//TODO
 // testing api
-exports.app.get("/test", (req, res, next) => {
-    res.status(200).json({
-        success: true,
-        message: "API is working",
-    });
-});
+// app.get("/test", (req: Request, res: Response, next: NextFunction) => {
+//   res.status(200).json({
+//     success: true,
+//     message: "API is working",
+//   });
+// });
 // unknown route
 exports.app.all("*", (req, res, next) => {
     const err = new Error(`Route ${req.originalUrl} not found`);

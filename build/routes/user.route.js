@@ -8,6 +8,7 @@ const user_controller_1 = require("../controllers/user.controller");
 const auth_1 = require("../middleware/auth");
 const userRouter = express_1.default.Router();
 userRouter.post("/registration", user_controller_1.registrationUser);
+userRouter.get("/test", user_controller_1.test);
 userRouter.post("/activate-user", user_controller_1.activateUser);
 userRouter.post("/login", user_controller_1.loginUser);
 userRouter.get("/logout", auth_1.isAutheticated, user_controller_1.logoutUser);

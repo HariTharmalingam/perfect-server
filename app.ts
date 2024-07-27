@@ -16,8 +16,8 @@ app.use(cookieParser());
 // cors => cross origin resource sharing
 app.use(
   cors({
-    origin: ["http://localhost:8000"],
-    // credentials: true,
+    origin: process.env.ORIGIN,
+    credentials: true,
   })
 );
 
@@ -35,13 +35,14 @@ app.use(
   userRouter
 );
 
+//TODO
 // testing api
-app.get("/test", (req: Request, res: Response, next: NextFunction) => {
-  res.status(200).json({
-    success: true,
-    message: "API is working",
-  });
-});
+// app.get("/test", (req: Request, res: Response, next: NextFunction) => {
+//   res.status(200).json({
+//     success: true,
+//     message: "API is working",
+//   });
+// });
 
 // unknown route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
