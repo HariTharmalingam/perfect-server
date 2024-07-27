@@ -12,13 +12,11 @@ import {
   updateProfilePicture,
   updateUserInfo,
   updateUserRole,
-  test
 } from "../controllers/user.controller";
 import { authorizeRoles, isAutheticated } from "../middleware/auth";
 const userRouter = express.Router();
 
 userRouter.post("/registration", registrationUser);
-userRouter.get("/test", test);
 
 userRouter.post("/activate-user", activateUser);
 

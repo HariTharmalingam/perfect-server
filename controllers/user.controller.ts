@@ -19,24 +19,6 @@ import cloudinary from "cloudinary";
 import moment from 'moment';
 import dayjs from 'dayjs';
 
-export const test = (
-  async (req: Request, res: Response, next: NextFunction) => {
-    
-
-
-
-
-
-
-        res.status(200).json({
-          success: true,
-          message: "API is working",
-        });
-
-      }
-);
-
-
 // register user
 interface IRegistrationBody {
   name: string;
