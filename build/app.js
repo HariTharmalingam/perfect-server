@@ -7,7 +7,6 @@ exports.app = void 0;
 require("dotenv").config();
 const express_1 = __importDefault(require("express"));
 exports.app = (0, express_1.default)();
-const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const error_1 = require("./middleware/error");
 const user_route_1 = __importDefault(require("./routes/user.route"));
@@ -16,11 +15,13 @@ const express_rate_limit_1 = require("express-rate-limit");
 exports.app.use(express_1.default.json({ limit: "50mb" }));
 // cookie parser
 exports.app.use((0, cookie_parser_1.default)());
-// cors => cross origin resource sharing
-exports.app.use((0, cors_1.default)({
-    origin: process.env.ORIGIN,
-    credentials: true,
-}));
+// // cors => cross origin resource sharing
+// app.use(
+//   cors({
+//     origin: process.env.ORIGIN,
+//     credentials: true,
+//   })
+// );
 // api requests limit
 const limiter = (0, express_rate_limit_1.rateLimit)({
     windowMs: 15 * 60 * 1000,
@@ -30,14 +31,13 @@ const limiter = (0, express_rate_limit_1.rateLimit)({
 });
 // routes
 exports.app.use("/api", user_route_1.default);
-//TODO
 // testing api
-// app.get("/test", (req: Request, res: Response, next: NextFunction) => {
-//   res.status(200).json({
-//     success: true,
-//     message: "API is working",
-//   });
-// });
+exports.app.get("/test", (req, res, next) => {
+    res.status(200).json({
+        success: true,
+        message: "API is working",
+    });
+});
 // unknown route
 exports.app.all("*", (req, res, next) => {
     const err = new Error(`Route ${req.originalUrl} not found`);
