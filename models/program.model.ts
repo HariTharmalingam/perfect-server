@@ -2,9 +2,9 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 import { IUser } from "./user.model";
 
 export interface IProgram extends Document {
-  id: number
-  name: string
-  session: ISession[]
+  id: number;
+  name: string;
+  session: ISession[];
 }
 
 

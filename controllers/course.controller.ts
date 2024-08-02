@@ -184,11 +184,11 @@ export const addQuestion = CatchAsyncError(
         return next(new ErrorHandler("Invalid content id", 400));
       }
 
-      const couseContent = course?.courseData?.find((item: any) =>
+      const courseContent = course?.courseData?.find((item: any) =>
         item._id.equals(contentId)
       );
 
-      if (!couseContent) {
+      if (!courseContent) {
         return next(new ErrorHandler("Invalid content id", 400));
       }
 
@@ -200,12 +200,12 @@ export const addQuestion = CatchAsyncError(
       };
 
       // add this question to our course content
-      couseContent.questions.push(newQuestion);
+      courseContent.questions.push(newQuestion);
 
       await NotificationModel.create({
         user: req.user?._id,
         title: "New Question Received",
-        message: `You have a new question in ${couseContent.title}`,
+        message: `You have a new question in ${courseContent.title}`,
       });
 
       // save the updated course
@@ -241,15 +241,15 @@ export const addAnwser = CatchAsyncError(
         return next(new ErrorHandler("Invalid content id", 400));
       }
 
-      const couseContent = course?.courseData?.find((item: any) =>
+      const courseContent = course?.courseData?.find((item: any) =>
         item._id.equals(contentId)
       );
 
-      if (!couseContent) {
+      if (!courseContent) {
         return next(new ErrorHandler("Invalid content id", 400));
       }
 
-      const question = couseContent?.questions?.find((item: any) =>
+      const question = courseContent?.questions?.find((item: any) =>
         item._id.equals(questionId)
       );
 
@@ -275,12 +275,12 @@ export const addAnwser = CatchAsyncError(
         await NotificationModel.create({
           user: req.user?._id,
           title: "New Question Reply Received",
-          message: `You have a new question reply in ${couseContent.title}`,
+          message: `You have a new question reply in ${courseContent.title}`,
         });
       } else {
         const data = {
           name: question.user.name,
-          title: couseContent.title,
+          title: courseContent.title,
         };
 
         const html = await ejs.renderFile(
