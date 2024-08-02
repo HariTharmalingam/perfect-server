@@ -5,6 +5,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "./middleware/error";
 import userRouter from "./routes/user.route";
+import courseRouter from "./routes/course.route";
+import layoutRouter from "./routes/layout.route";
 import { rateLimit } from "express-rate-limit";
 
 // body parser
@@ -32,7 +34,9 @@ const limiter = rateLimit({
 // routes
 app.use(
   "/api",
-  userRouter
+  userRouter,
+  courseRouter,
+  layoutRouter
 );
 
 // testing api
