@@ -7,6 +7,7 @@ import { ErrorMiddleware } from "./middleware/error";
 import userRouter from "./routes/user.route";
 import courseRouter from "./routes/course.route";
 import layoutRouter from "./routes/layout.route";
+import programRouter from "./routes/program.route";
 import { rateLimit } from "express-rate-limit";
 
 // body parser
@@ -36,7 +37,8 @@ app.use(
   "/api",
   userRouter,
   courseRouter,
-  layoutRouter
+  layoutRouter,
+  programRouter
 );
 
 // testing api
