@@ -36,7 +36,7 @@ exports.getSingleProgram = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, r
 // get all programs --- without purchasing
 exports.getAllPrograms = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
-        const programs = await program_model_1.default.find().select("-programData.videoUrl -programData.suggestion -programData.questions -programData.links");
+        const programs = await program_model_1.default.find();
         res.status(200).json({
             success: true,
             programs,

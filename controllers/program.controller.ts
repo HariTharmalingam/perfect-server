@@ -48,9 +48,7 @@ export const getSingleProgram = CatchAsyncError(
 export const getAllPrograms = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const programs = await ProgramModel.find().select(
-        "-programData.videoUrl -programData.suggestion -programData.questions -programData.links"
-      );
+      const programs = await ProgramModel.find();
 
       res.status(200).json({
         success: true,
