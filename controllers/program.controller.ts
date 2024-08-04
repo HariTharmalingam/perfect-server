@@ -4,6 +4,7 @@ import ErrorHandler from "../utils/ErrorHandler";
 import cloudinary from "cloudinary";
 import { createProgram, getAllProgramsService } from "../services/program.service";
 import ProgramModel from "../models/program.model";
+import CourseModel from "../models/course.model";
 import { redis } from "../utils/redis";
 import mongoose from "mongoose";
 import path from "path";
@@ -48,7 +49,7 @@ export const getSingleProgram = CatchAsyncError(
 export const getAllPrograms = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const programs = await ProgramModel.find();
+      const programs = await CourseModel.find();
 
       res.status(200).json({
         success: true,
