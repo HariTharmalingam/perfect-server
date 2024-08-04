@@ -7,7 +7,6 @@ exports.getAllPrograms = exports.getSingleProgram = void 0;
 const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
 const ErrorHandler_1 = __importDefault(require("../utils/ErrorHandler"));
 const program_model_1 = __importDefault(require("../models/program.model"));
-const course_model_1 = __importDefault(require("../models/course.model"));
 const redis_1 = require("../utils/redis");
 // get single program --- without purchasing
 exports.getSingleProgram = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
@@ -37,7 +36,7 @@ exports.getSingleProgram = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, r
 // get all programs --- without purchasing
 exports.getAllPrograms = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
-        const programs = await course_model_1.default.find();
+        const programs = await program_model_1.default.find();
         res.status(200).json({
             success: true,
             programs,

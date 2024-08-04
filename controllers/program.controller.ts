@@ -49,7 +49,7 @@ export const getSingleProgram = CatchAsyncError(
 export const getAllPrograms = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const programs = await CourseModel.find();
+      const programs = await ProgramModel.find();
 
       res.status(200).json({
         success: true,
