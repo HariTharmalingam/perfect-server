@@ -56,5 +56,5 @@ const programSchema = new mongoose_1.Schema({
     },
     session: [sessionSchema],
 }, { timestamps: true });
-const ProgramModel = mongoose_1.default.model("Programs", programSchema);
+const ProgramModel = mongoose_1.default.model("Program", programSchema);
 exports.default = ProgramModel;

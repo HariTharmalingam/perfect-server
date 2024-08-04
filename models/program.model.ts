@@ -68,6 +68,6 @@ const programSchema = new Schema<IProgram>({
   session: [sessionSchema],
 },{timestamps: true});
 
-const ProgramModel: Model<IProgram> = mongoose.model("Programs", programSchema);
+const ProgramModel: Model<IProgram> = mongoose.model("Program", programSchema);
 
 export default ProgramModel;
