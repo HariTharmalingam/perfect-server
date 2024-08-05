@@ -49,7 +49,7 @@ const userSchema = new mongoose_1.default.Schema({
     ],
     programs: [
         {
-            programId: String,
+            programId: Number,
         },
     ],
     activationDate: {
