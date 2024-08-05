@@ -61,33 +61,35 @@ export const getAllPrograms = CatchAsyncError(
   }
 );
 
-// // get program content -- only for valid user
-// export const getProgramByUser = CatchAsyncError(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const userProgramList = req.user?.programs;
-//       const programId = req.params.id;
+// get program content -- only for valid user
+export const getProgramByUser = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userProgramList = req.user?.programs;
+      console.log("userProgramList",userProgramList)
+      const programId = req.params.id;
+      console.log("programId",programId)
 
-//       const programExists = userProgramList?.find(
-//         (program: any) => program._id.toString() === programId
-//       );
+      const programExists = userProgramList?.find(
+        (program: any) => program._id.toString() === programId
+      );
 
-//       if (!programExists) {
-//         return next(
-//           new ErrorHandler("You are not eligible to access this program", 404)
-//         );
-//       }
+      if (!programExists) {
+        return next(
+          new ErrorHandler("You are not eligible to access this program", 404)
+        );
+      }
 
-//       const program = await ProgramModel.findById(programId);
+      const program = await ProgramModel.findById(programId);
 
-//       const content = program?.programData;
+      const content = program;
 
-//       res.status(200).json({
-//         success: true,
-//         content,
-//       });
-//     } catch (error: any) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   }
-// );
+      res.status(200).json({
+        success: true,
+        content,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);

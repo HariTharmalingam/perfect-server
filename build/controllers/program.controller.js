@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllPrograms = exports.getSingleProgram = void 0;
+exports.getProgramByUser = exports.getAllPrograms = exports.getSingleProgram = void 0;
 const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
 const ErrorHandler_1 = __importDefault(require("../utils/ErrorHandler"));
 const program_model_1 = __importDefault(require("../models/program.model"));
@@ -46,28 +46,25 @@ exports.getAllPrograms = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res
         return next(new ErrorHandler_1.default(error.message, 500));
     }
 });
-// // get program content -- only for valid user
-// export const getProgramByUser = CatchAsyncError(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const userProgramList = req.user?.programs;
-//       const programId = req.params.id;
-//       const programExists = userProgramList?.find(
-//         (program: any) => program._id.toString() === programId
-//       );
-//       if (!programExists) {
-//         return next(
-//           new ErrorHandler("You are not eligible to access this program", 404)
-//         );
-//       }
-//       const program = await ProgramModel.findById(programId);
-//       const content = program?.programData;
-//       res.status(200).json({
-//         success: true,
-//         content,
-//       });
-//     } catch (error: any) {
-//       return next(new ErrorHandler(error.message, 500));
-//     }
-//   }
-// );
+// get program content -- only for valid user
+exports.getProgramByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
+    try {
+        const userProgramList = req.user?.programs;
+        console.log("userProgramList", userProgramList);
+        const programId = req.params.id;
+        console.log("programId", programId);
+        const programExists = userProgramList?.find((program) => program._id.toString() === programId);
+        if (!programExists) {
+            return next(new ErrorHandler_1.default("You are not eligible to access this program", 404));
+        }
+        const program = await program_model_1.default.findById(programId);
+        const content = program;
+        res.status(200).json({
+            success: true,
+            content,
+        });
+    }
+    catch (error) {
+        return next(new ErrorHandler_1.default(error.message, 500));
+    }
+});
