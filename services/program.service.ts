@@ -26,7 +26,6 @@ export const getAllProgramsService = async (res: Response) => {
 //Get Programs of Users
 export const getProgamsByUserId = async (id: string, res: Response) => {
   const userJson = await redis.get(id);
-  console.log('userJson',userJson)
   if (userJson) {
     const userPrograms = JSON.parse(userJson);
     res.status(201).json({
