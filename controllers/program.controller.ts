@@ -5,6 +5,7 @@ import cloudinary from "cloudinary";
 import { createProgram, getAllProgramsService } from "../services/program.service";
 import ProgramModel from "../models/program.model";
 import CourseModel from "../models/course.model";
+import userModel from "../models/user.model";
 import { redis } from "../utils/redis";
 import mongoose from "mongoose";
 import path from "path";
@@ -12,6 +13,7 @@ import ejs from "ejs";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.Model";
 import axios from "axios";
+import { getProgamsByUserId } from "../services/program.service";
 
 // get single program --- without purchasing
 export const getSingleProgram = CatchAsyncError(
@@ -49,6 +51,9 @@ export const getSingleProgram = CatchAsyncError(
 export const getAllPrograms = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = req.user?._id;
+
+      getProgamsByUserId(userId,res)
       const programs = await ProgramModel.find();
 
       res.status(200).json({
@@ -66,9 +71,7 @@ export const getProgramByUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userProgramList = req.user?.programs;
-      console.log("userProgramList",userProgramList)
       const programId = req.params.id;
-      console.log("programId",programId)
 
       const programExists = userProgramList?.find(
         (program: any) => program._id.toString() === programId

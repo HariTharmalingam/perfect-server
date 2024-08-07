@@ -136,6 +136,8 @@ exports.logoutUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, ne
 exports.updateAccessToken = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
         const refresh_token = req.headers["refresh-token"];
+        //LOCALHOST
+        // const refresh_token = req.cookies.refresh_token;
         const decoded = jsonwebtoken_1.default.verify(refresh_token, process.env.REFRESH_TOKEN);
         const message = "Could not refresh token";
         if (!decoded) {

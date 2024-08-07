@@ -8,6 +8,7 @@ import userRouter from "./routes/user.route";
 import courseRouter from "./routes/course.route";
 import layoutRouter from "./routes/layout.route";
 import programRouter from "./routes/program.route";
+import orderRouter from "./routes/order.route";
 import { rateLimit } from "express-rate-limit";
 
 // body parser
@@ -38,7 +39,8 @@ app.use(
   userRouter,
   courseRouter,
   layoutRouter,
-  programRouter
+  programRouter,
+  orderRouter
 );
 
 // testing api

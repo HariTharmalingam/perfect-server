@@ -8,6 +8,7 @@ const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
 const ErrorHandler_1 = __importDefault(require("../utils/ErrorHandler"));
 const program_model_1 = __importDefault(require("../models/program.model"));
 const redis_1 = require("../utils/redis");
+const program_service_1 = require("../services/program.service");
 // get single program --- without purchasing
 exports.getSingleProgram = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
@@ -36,6 +37,8 @@ exports.getSingleProgram = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, r
 // get all programs --- without purchasing
 exports.getAllPrograms = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
+        const userId = req.user?._id;
+        (0, program_service_1.getProgamsByUserId)(userId, res);
         const programs = await program_model_1.default.find();
         res.status(200).json({
             success: true,
@@ -50,9 +53,7 @@ exports.getAllPrograms = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res
 exports.getProgramByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
         const userProgramList = req.user?.programs;
-        console.log("userProgramList", userProgramList);
         const programId = req.params.id;
-        console.log("programId", programId);
         const programExists = userProgramList?.find((program) => program._id.toString() === programId);
         if (!programExists) {
             return next(new ErrorHandler_1.default("You are not eligible to access this program", 404));
