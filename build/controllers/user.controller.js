@@ -91,7 +91,7 @@ exports.activateUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, 
 });
 exports.loginUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
-        const { email, password, createdAt } = req.body;
+        const { email, password } = req.body;
         if (!email || !password) {
             return next(new ErrorHandler_1.default("Please enter email and password", 400));
         }

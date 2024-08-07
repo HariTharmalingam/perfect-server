@@ -11,8 +11,9 @@ const redis_1 = require("../utils/redis");
 const user_controller_1 = require("../controllers/user.controller");
 // authenticated user
 exports.isAutheticated = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
-    // const access_token = req.headers["access-token"] as string;
-    const access_token = req.cookies.access_token;
+    const access_token = req.headers["access-token"];
+    //LOCALHOST
+    // const access_token = req.cookies.access_token;
     if (!access_token) {
         return next(new ErrorHandler_1.default("Please login to access this resource", 400));
     }

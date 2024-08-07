@@ -144,13 +144,12 @@ export const activateUser = CatchAsyncError(
 interface ILoginRequest {
   email: string;
   password: string;
-  createdAt: string;
 }
 
 export const loginUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, password, createdAt } = req.body as ILoginRequest;
+      const { email, password } = req.body as ILoginRequest;
       if (!email || !password) {
         return next(new ErrorHandler("Please enter email and password", 400));
       }
