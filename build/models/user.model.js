@@ -41,15 +41,9 @@ const userSchema = new mongoose_1.default.Schema({
         type: Boolean,
         default: false,
     },
-    //TODO
-    courses: [
-        {
-            courseId: String,
-        },
-    ],
     programs: [
         {
-            programId: Number,
+            programId: String,
         },
     ],
     activationDate: {

@@ -5,7 +5,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "./middleware/error";
 import userRouter from "./routes/user.route";
-import courseRouter from "./routes/course.route";
 import layoutRouter from "./routes/layout.route";
 import programRouter from "./routes/program.route";
 import orderRouter from "./routes/order.route";
@@ -37,7 +36,6 @@ const limiter = rateLimit({
 app.use(
   "/api",
   userRouter,
-  courseRouter,
   layoutRouter,
   programRouter,
   orderRouter
