@@ -130,3 +130,24 @@ export const newPayment = CatchAsyncError(
     }
   }
 );
+
+
+export const createSubcription = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const customer = await stripe.customers.create({
+        email: req.body.email,
+        source: req.body.stripeToken,
+      });
+
+      const subscription = await stripe.subscriptions.create({
+        customer: customer.id,
+        items: [{ plan: req.body.plan }],
+      });
+    
+      res.json({ subscription });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);

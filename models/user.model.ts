@@ -15,7 +15,7 @@ export interface IUser extends Document {
   };
   role: string;
   isVerified: boolean;
-  programs: Array<{ programsId: string }>;
+  programs: Array<{ programId: string }>;
   activationDate: Date;
   comparePassword: (password: string) => Promise<boolean>;
   SignAccessToken: () => string;

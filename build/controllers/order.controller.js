@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.newPayment = exports.sendStripePublishableKey = exports.createMobileOrder = void 0;
+exports.createSubcription = exports.newPayment = exports.sendStripePublishableKey = exports.createMobileOrder = void 0;
 const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
 const ErrorHandler_1 = __importDefault(require("../utils/ErrorHandler"));
 const user_model_1 = __importDefault(require("../models/user.model"));
@@ -105,6 +105,22 @@ exports.newPayment = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, ne
             success: true,
             client_secret: myPayment.client_secret,
         });
+    }
+    catch (error) {
+        return next(new ErrorHandler_1.default(error.message, 500));
+    }
+});
+exports.createSubcription = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
+    try {
+        const customer = await stripe.customers.create({
+            email: req.body.email,
+            source: req.body.stripeToken,
+        });
+        const subscription = await stripe.subscriptions.create({
+            customer: customer.id,
+            items: [{ plan: req.body.plan }],
+        });
+        res.json({ subscription });
     }
     catch (error) {
         return next(new ErrorHandler_1.default(error.message, 500));
