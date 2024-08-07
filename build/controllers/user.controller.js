@@ -159,6 +159,7 @@ exports.updateAccessToken = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
 // get user info
 exports.getUserInfo = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
+        console.log("controller");
         const userId = req.user?._id;
         (0, user_service_1.getUserById)(userId, res);
     }

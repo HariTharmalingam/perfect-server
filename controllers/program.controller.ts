@@ -15,44 +15,44 @@ import NotificationModel from "../models/notification.Model";
 import axios from "axios";
 import { getProgamsByUserId } from "../services/program.service";
 
-// get single program --- without purchasing
-export const getSingleProgram = CatchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const programId = req.params.id;
+// // get single program --- without purchasing
+// export const getSingleProgram = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const programId = req.params.id;
 
-      const isCacheExist = await redis.get(programId);
+//       const isCacheExist = await redis.get(programId);
 
-      if (isCacheExist) {
-        const program = JSON.parse(isCacheExist);
-        res.status(200).json({
-          success: true,
-          program,
-        });
-      } else {
-        const program = await ProgramModel.findById(req.params.id).select(
-          "-programData.videoUrl -programData.suggestion -programData.questions -programData.links"
-        );
+//       if (isCacheExist) {
+//         const program = JSON.parse(isCacheExist);
+//         res.status(200).json({
+//           success: true,
+//           program,
+//         });
+//       } else {
+//         const program = await ProgramModel.findById(req.params.id).select(
+//           "-programData.videoUrl -programData.suggestion -programData.questions -programData.links"
+//         );
 
-        await redis.set(programId, JSON.stringify(program), "EX", 604800); // 7days
+//         await redis.set(programId, JSON.stringify(program), "EX", 604800); // 7days
 
-        res.status(200).json({
-          success: true,
-          program,
-        });
-      }
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, 500));
-    }
-  }
-);
+//         res.status(200).json({
+//           success: true,
+//           program,
+//         });
+//       }
+//     } catch (error: any) {
+//       return next(new ErrorHandler(error.message, 500));
+//     }
+//   }
+// );
 
 // get all programs --- without purchasing
 export const getAllPrograms = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?._id;
-
+      console.log(userId)
       getProgamsByUserId(userId,res)
       const programs = await ProgramModel.find();
 
