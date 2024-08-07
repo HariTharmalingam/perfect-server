@@ -5,7 +5,7 @@ import userModel from "../models/user.model";
 // get user by id
 export const getUserById = async (id: string, res: Response) => {
   const userJson = await redis.get(id);
-  console.log('userJson',userJson)
+  console.log('userJson',userJson);
 
   if (userJson) {
     const user = JSON.parse(userJson);
