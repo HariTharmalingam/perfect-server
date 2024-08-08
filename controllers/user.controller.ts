@@ -163,6 +163,8 @@ export const loginUser = CatchAsyncError(
       if (!isPasswordMatch) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
+      const test = user.programs
+      console.log(test)
       sendToken(user, 200, res);
       //TODO
       // const date1 = moment('2024-04-17T08:23:27');

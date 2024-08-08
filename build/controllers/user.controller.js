@@ -103,6 +103,8 @@ exports.loginUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, nex
         if (!isPasswordMatch) {
             return next(new ErrorHandler_1.default("Invalid email or password", 400));
         }
+        const test = user.programs;
+        console.log(test);
         (0, jwt_1.sendToken)(user, 200, res);
         //TODO
         // const date1 = moment('2024-04-17T08:23:27');
