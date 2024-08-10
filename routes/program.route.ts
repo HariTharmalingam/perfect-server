@@ -6,7 +6,7 @@ import {
 import { authorizeRoles, isAutheticated } from "../middleware/auth";
 const programRouter = express.Router();
 
-programRouter.get("/get-program-content/:id", getProgramByUser);
+programRouter.get("/get-program-content/", getProgramByUser);
 programRouter.get("/get-programs", getAllPrograms);
 
 

@@ -70,27 +70,26 @@ export const getAllPrograms = CatchAsyncError(
 export const getProgramByUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userProgramList = req.user?.programs;
-      const programId = req.params.id;
+      const userId = req.user?._id;
+      const test = getProgamsByUserId(userId,res)
+      // const userProgramList = req.user?.programs;
+      // const programId = req.params.id;
 
-      const programExists = userProgramList?.find(
-        (program: any) => program._id.toString() === programId
-      );
+      // const programExists = userProgramList?.find(
+      //   (program: any) => program._id.toString() === programId
+      // );
 
-      if (!programExists) {
-        return next(
-          new ErrorHandler("You are not eligible to access this program", 404)
-        );
-      }
+      // if (!programExists) {
+      //   return next(
+      //     new ErrorHandler("You are not eligible to access this program", 404)
+      //   );
+      // }
 
-      const program = await ProgramModel.findById(programId);
+      // const program = await ProgramModel.findById(programId);
 
-      const content = program;
+      // const content = program;
 
-      res.status(200).json({
-        success: true,
-        content,
-      });
+     
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
