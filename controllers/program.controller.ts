@@ -52,7 +52,6 @@ export const getAllPrograms = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?._id;
-      console.log(userId)
       getProgamsByUserId(userId,res)
       const programs = await ProgramModel.find();
 
@@ -71,7 +70,7 @@ export const getProgramByUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?._id;
-      const test = getProgamsByUserId(userId,res)
+      // const test = getProgamsByUserId(userId,res)
       // const userProgramList = req.user?.programs;
       // const programId = req.params.id;
 
@@ -89,8 +88,9 @@ export const getProgramByUser = CatchAsyncError(
 
       // const content = program;
 
-      res.status(200).json({
-        success: userId,
+      res.status(201).json({
+        success: true,
+        userId,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));

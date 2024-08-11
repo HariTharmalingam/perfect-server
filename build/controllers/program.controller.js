@@ -39,7 +39,6 @@ const program_service_1 = require("../services/program.service");
 exports.getAllPrograms = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
         const userId = req.user?._id;
-        console.log(userId);
         (0, program_service_1.getProgamsByUserId)(userId, res);
         const programs = await program_model_1.default.find();
         res.status(200).json({
@@ -55,7 +54,7 @@ exports.getAllPrograms = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res
 exports.getProgramByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
         const userId = req.user?._id;
-        const test = (0, program_service_1.getProgamsByUserId)(userId, res);
+        // const test = getProgamsByUserId(userId,res)
         // const userProgramList = req.user?.programs;
         // const programId = req.params.id;
         // const programExists = userProgramList?.find(
@@ -68,8 +67,9 @@ exports.getProgramByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, r
         // }
         // const program = await ProgramModel.findById(programId);
         // const content = program;
-        res.status(200).json({
-            success: userId,
+        res.status(201).json({
+            success: true,
+            userId,
         });
     }
     catch (error) {
