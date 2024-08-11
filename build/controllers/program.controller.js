@@ -69,8 +69,7 @@ exports.getProgramByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, r
         // const program = await ProgramModel.findById(programId);
         // const content = program;
         res.status(200).json({
-            success: true,
-            userId,
+            success: userId,
         });
     }
     catch (error) {

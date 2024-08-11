@@ -90,8 +90,7 @@ export const getProgramByUser = CatchAsyncError(
       // const content = program;
 
       res.status(200).json({
-        success: true,
-        userId,
+        success: userId,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
