@@ -70,7 +70,7 @@ exports.getProgramByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, r
         // const content = program;
         res.status(200).json({
             success: true,
-            test,
+            userId,
         });
     }
     catch (error) {
