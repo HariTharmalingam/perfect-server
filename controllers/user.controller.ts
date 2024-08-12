@@ -16,8 +16,7 @@ import {
 } from "../services/user.service"
 import cloudinary from "cloudinary";
 
-import moment from 'moment';
-import dayjs from 'dayjs';
+
 
 // register user
 interface IRegistrationBody {
@@ -164,14 +163,7 @@ export const loginUser = CatchAsyncError(
         return next(new ErrorHandler("Invalid email or password", 400));
       }
       sendToken(user, 200, res);
-      //TODO
-      // const date1 = moment('2024-04-17T08:23:27');
-      // console.log(date1);
-      
-      // const date2 = moment();
-      // console.log(date2);
-      // console.log(date2.diff(date1,'week'));  
-      // console.log(user.createdAt);  
+
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -237,9 +229,8 @@ export const updateAccessToken = CatchAsyncError(
 export const getUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("controller")
       const userId = req.user?._id;
-      getUserById(userId, res);
+      await getUserById(userId, res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }

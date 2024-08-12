@@ -17,19 +17,18 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 export const createMobileOrder = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { subscriptionId, payment_info } = req.body as IOrder;
+      const { programId, payment_info } = req.body as IOrder;
       const user = await userModel.findById(req.user?._id);
 
-      //TODO
-      // const courseExistInUser = user?.courses.some(
-      //   (course: any) => course._id.toString() === courseId
-      // );
+      const programExistInUser = user?.programs.some(
+        (program: any) => program._id.toString() === programId
+      );
 
-      // if (courseExistInUser) {
-      //   return next(
-      //     new ErrorHandler("You have already purchased this course", 400)
-      //   );
-      // }
+      if (programExistInUser) {
+        return next(
+          new ErrorHandler("You have already purchased this program", 400)
+        );
+      }
 
       const subscription: ISubscription | null = await SubscriptionModel.findById(subscriptionId);
 

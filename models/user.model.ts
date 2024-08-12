@@ -15,7 +15,7 @@ export interface IUser extends Document {
   };
   role: string;
   isVerified: boolean;
-  programs: Array<{ programId: string }>;
+  programs: Array<{ programId: string, purchasedDay : Date }>;
   activationDate: Date;
   comparePassword: (password: string) => Promise<boolean>;
   SignAccessToken: () => string;
@@ -56,14 +56,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    programs: [
-      {
-        programId: String,
-      },
-    ],
-    activationDate:{
-      type: Date
-    }
+    programs: [{ programId: { type: String }, purchasedDay: {type : Date} }],
   },
   { timestamps: true }
 );

@@ -1,6 +1,7 @@
 import { Response } from "express";
 import ProgramModel from "../models/program.model";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
+import moment from 'moment';
 import { redis } from "../utils/redis";
 
 // create program
@@ -24,14 +25,26 @@ export const getAllProgramsService = async (res: Response) => {
   
 
 //Get Programs of Users
-export const getProgamsByUserId = async (id: string, res: Response) => {
+export const getProgamsByUserId = async (id: string,  res: Response) => {
   const userJson = await redis.get(id);
+
   if (userJson) {
-    const userPrograms = JSON.parse(userJson);
+    const user = JSON.parse(userJson);
+
+    const array:any = [];
+
+    await Promise.all(user.programs.map(async (element:any) => {
+      array.push(await ProgramModel.findById(element.programId))
+      const currentProgramWeek = moment().diff(element.purchasedDay, 'week')
+      array.push({"currentProgramWeek": currentProgramWeek})
+    }))
+
     res.status(201).json({
       success: true,
-      userPrograms,
+      array,
     });
   }
+  
+
 };
 

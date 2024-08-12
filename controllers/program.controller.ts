@@ -15,6 +15,8 @@ import NotificationModel from "../models/notification.Model";
 import axios from "axios";
 import { getProgamsByUserId } from "../services/program.service";
 
+import moment from 'moment';
+
 // // get single program --- without purchasing
 // export const getSingleProgram = CatchAsyncError(
 //   async (req: Request, res: Response, next: NextFunction) => {
@@ -51,8 +53,6 @@ import { getProgamsByUserId } from "../services/program.service";
 export const getAllPrograms = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user?._id;
-      getProgamsByUserId(userId,res)
       const programs = await ProgramModel.find();
 
       res.status(200).json({
@@ -66,31 +66,16 @@ export const getAllPrograms = CatchAsyncError(
 );
 
 // get program content -- only for valid user
-export const getProgramByUser = CatchAsyncError(
+export const getProgramsByUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?._id;
-      // const test = getProgamsByUserId(userId,res)
-      // const userProgramList = req.user?.programs;
-      // const programId = req.params.id;
+      await getProgamsByUserId(userId, res);
+      
 
-      // const programExists = userProgramList?.find(
-      //   (program: any) => program._id.toString() === programId
-      // );
-
-      // if (!programExists) {
-      //   return next(
-      //     new ErrorHandler("You are not eligible to access this program", 404)
-      //   );
-      // }
-
-      // const program = await ProgramModel.findById(programId);
-
-      // const content = program;
-
-      res.status(201).json({
+      res.status(200).json({
         success: true,
-        userId,
+        res
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
