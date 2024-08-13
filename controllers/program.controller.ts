@@ -70,12 +70,15 @@ export const getProgramsByUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?._id;
-      await getProgamsByUserId(userId, res);
+      if (!userId) {
+        return next(new ErrorHandler("User ID not found", 400));
+      }
+      const programs = await getProgamsByUserId(userId, res);
       
 
       res.status(200).json({
         success: true,
-        res
+        programs
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));

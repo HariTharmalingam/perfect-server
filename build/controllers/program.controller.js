@@ -52,10 +52,13 @@ exports.getAllPrograms = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res
 exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
         const userId = req.user?._id;
-        await (0, program_service_1.getProgamsByUserId)(userId, res);
+        if (!userId) {
+            return next(new ErrorHandler_1.default("User ID not found", 400));
+        }
+        const programs = await (0, program_service_1.getProgamsByUserId)(userId, res);
         res.status(200).json({
             success: true,
-            res
+            programs
         });
     }
     catch (error) {
