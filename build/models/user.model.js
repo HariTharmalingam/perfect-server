@@ -41,14 +41,7 @@ const userSchema = new mongoose_1.default.Schema({
         type: Boolean,
         default: false,
     },
-    programs: [
-        {
-            programId: String,
-        },
-    ],
-    activationDate: {
-        type: Date
-    }
+    programs: [{ programId: { type: String }, purchasedDay: { type: Date } }],
 }, { timestamps: true });
 // Hash Password before saving
 userSchema.pre("save", async function (next) {

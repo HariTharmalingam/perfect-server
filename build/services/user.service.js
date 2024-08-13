@@ -9,7 +9,6 @@ const user_model_1 = __importDefault(require("../models/user.model"));
 // get user by id
 const getUserById = async (id, res) => {
     const userJson = await redis_1.redis.get(id);
-    console.log('userJson', userJson);
     if (userJson) {
         const user = JSON.parse(userJson);
         res.status(201).json({

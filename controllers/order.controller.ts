@@ -17,18 +17,19 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 export const createMobileOrder = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { programId, payment_info } = req.body as IOrder;
+      const { subscriptionId, payment_info } = req.body as IOrder;
       const user = await userModel.findById(req.user?._id);
 
-      const programExistInUser = user?.programs.some(
-        (program: any) => program._id.toString() === programId
-      );
+      //TODO
+      // const courseExistInUser = user?.courses.some(
+      //   (course: any) => course._id.toString() === courseId
+      // );
 
-      if (programExistInUser) {
-        return next(
-          new ErrorHandler("You have already purchased this program", 400)
-        );
-      }
+      // if (courseExistInUser) {
+      //   return next(
+      //     new ErrorHandler("You have already purchased this course", 400)
+      //   );
+      // }
 
       const subscription: ISubscription | null = await SubscriptionModel.findById(subscriptionId);
 
@@ -130,23 +131,3 @@ export const newPayment = CatchAsyncError(
   }
 );
 
-
-export const createSubcription = CatchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const customer = await stripe.customers.create({
-        email: req.body.email,
-        source: req.body.stripeToken,
-      });
-
-      const subscription = await stripe.subscriptions.create({
-        customer: customer.id,
-        items: [{ plan: req.body.plan }],
-      });
-    
-      res.json({ subscription });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, 500));
-    }
-  }
-);

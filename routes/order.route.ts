@@ -4,8 +4,6 @@ import {
   createMobileOrder,
   newPayment,
   sendStripePublishableKey,
-  createSubcription,
-  createCheckoutSubcription
 } from "../controllers/order.controller";
 const orderRouter = express.Router();
 
@@ -15,8 +13,8 @@ orderRouter.get("/payment/stripepublishablekey", sendStripePublishableKey);
 
 orderRouter.post("/payment", isAutheticated, newPayment);
 
-orderRouter.post("/create-subscription",createSubcription )
+// orderRouter.post("/create-subscription",createSubcription )
 
-orderRouter.post("/create-checkout-subscription",createCheckoutSubcription )
+// orderRouter.post("/create-checkout-subscription",createCheckoutSubcription )
 
 export default orderRouter;

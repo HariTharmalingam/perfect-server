@@ -8,6 +8,9 @@ import userRouter from "./routes/user.route";
 import layoutRouter from "./routes/layout.route";
 import programRouter from "./routes/program.route";
 import orderRouter from "./routes/order.route";
+import subscriptionRouter from "./routes/subscription.route";
+import notificationRouter from "./routes/notification.route";
+
 import { rateLimit } from "express-rate-limit";
 
 // body parser

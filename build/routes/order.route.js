@@ -10,5 +10,6 @@ const orderRouter = express_1.default.Router();
 orderRouter.post("/create-mobile-order", auth_1.isAutheticated, order_controller_1.createMobileOrder);
 orderRouter.get("/payment/stripepublishablekey", order_controller_1.sendStripePublishableKey);
 orderRouter.post("/payment", auth_1.isAutheticated, order_controller_1.newPayment);
-orderRouter.post("/create-subscription", order_controller_1.createSubcription);
+// orderRouter.post("/create-subscription",createSubcription )
+// orderRouter.post("/create-checkout-subscription",createCheckoutSubcription )
 exports.default = orderRouter;

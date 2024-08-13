@@ -18,13 +18,6 @@ const express_rate_limit_1 = require("express-rate-limit");
 exports.app.use(express_1.default.json({ limit: "50mb" }));
 // cookie parser
 exports.app.use((0, cookie_parser_1.default)());
-// // cors => cross origin resource sharing
-// app.use(
-//   cors({
-//     origin: process.env.ORIGIN,
-//     credentials: true,
-//   })
-// );
 // api requests limit
 const limiter = (0, express_rate_limit_1.rateLimit)({
     windowMs: 15 * 60 * 1000,

@@ -104,13 +104,6 @@ exports.loginUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, nex
             return next(new ErrorHandler_1.default("Invalid email or password", 400));
         }
         (0, jwt_1.sendToken)(user, 200, res);
-        //TODO
-        // const date1 = moment('2024-04-17T08:23:27');
-        // console.log(date1);
-        // const date2 = moment();
-        // console.log(date2);
-        // console.log(date2.diff(date1,'week'));  
-        // console.log(user.createdAt);  
     }
     catch (error) {
         return next(new ErrorHandler_1.default(error.message, 400));
@@ -159,9 +152,8 @@ exports.updateAccessToken = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
 // get user info
 exports.getUserInfo = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
-        console.log("controller");
         const userId = req.user?._id;
-        (0, user_service_1.getUserById)(userId, res);
+        await (0, user_service_1.getUserById)(userId, res);
     }
     catch (error) {
         return next(new ErrorHandler_1.default(error.message, 400));

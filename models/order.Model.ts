@@ -2,13 +2,13 @@ import mongoose, {Document,Model,Schema} from "mongoose";
 
 
 export interface IOrder extends Document{
-    programId: string;
+    subscriptionId: string;
     userId?:string;
     payment_info: object;
 }
 
 const orderSchema = new Schema<IOrder>({
-    programId: {
+    subscriptionId: {
         type: String,
         required: true
     },
