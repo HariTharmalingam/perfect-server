@@ -33,7 +33,8 @@ app.use(
   userRouter,
   layoutRouter,
   programRouter,
-  orderRouter
+  orderRouter,
+  notificationRouter
 );
 
 // testing api
