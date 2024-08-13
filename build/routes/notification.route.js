@@ -5,15 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const auth_1 = require("../middleware/auth");
-// import { getNotifications, updateNotification } from "../controllers/notification.controller";
 const notification_controller_1 = require("../controllers/notification.controller");
+const notification_controller_2 = require("../controllers/notification.controller");
 const notificationRouter = express_1.default.Router();
-// notificationRoute.get(
-//   "/get-all-notifications",
-//   isAutheticated,
-//   authorizeRoles("admin"),
-//   getNotifications
-// );
-// notificationRoute.put("/update-notification/:id", isAutheticated, authorizeRoles("admin"), updateNotification);
-notificationRouter.post("/post-notification/v2", auth_1.isAutheticated, notification_controller_1.SubscriptionUpdate);
+notificationRouter.get("/get-all-notifications", auth_1.isAutheticated, (0, auth_1.authorizeRoles)("admin"), notification_controller_1.getNotifications);
+notificationRouter.put("/update-notification/:id", auth_1.isAutheticated, (0, auth_1.authorizeRoles)("admin"), notification_controller_1.updateNotification);
+notificationRouter.post("/post-notification/v2", auth_1.isAutheticated, notification_controller_2.SubscriptionUpdate);
 exports.default = notificationRouter;
