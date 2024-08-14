@@ -7,7 +7,9 @@ exports.getProgramsByUser = exports.getAllPrograms = void 0;
 const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
 const ErrorHandler_1 = __importDefault(require("../utils/ErrorHandler"));
 const program_model_1 = __importDefault(require("../models/program.model"));
-const program_service_1 = require("../services/program.service");
+const program_model_2 = __importDefault(require("../models/program.model"));
+const user_model_1 = __importDefault(require("../models/user.model"));
+const moment_1 = __importDefault(require("moment"));
 // // get single program --- without purchasing
 // export const getSingleProgram = CatchAsyncError(
 //   async (req: Request, res: Response, next: NextFunction) => {
@@ -54,7 +56,24 @@ exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
         return next(new ErrorHandler_1.default("User ID not found", 400));
     }
     try {
-        const programs = await (0, program_service_1.getProgamsByUserId)(userId.toString());
+        const user = await user_model_1.default.findById(userId);
+        if (!user) {
+            return next(new ErrorHandler_1.default("User not found", 404));
+        }
+        const programs = await Promise.all(user.programs.map(async (userProgram) => {
+            const program = await program_model_2.default.findById(userProgram.programId);
+            if (!program) {
+                throw new Error(`Program not found: ${userProgram.programId}`);
+            }
+            const purchaseDate = (0, moment_1.default)(userProgram.purchasedDay).startOf('day');
+            const currentDate = (0, moment_1.default)().startOf('day');
+            const weeksDiff = currentDate.diff(purchaseDate, 'weeks');
+            const currentProgramWeek = weeksDiff + 1;
+            return {
+                ...program.toObject(),
+                currentProgramWeek
+            };
+        }));
         res.status(200).json({
             success: true,
             programs

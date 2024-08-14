@@ -15,6 +15,7 @@ import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.Model";
 import axios from "axios";
 import { getProgamsByUserId } from "../services/program.service";
+import User, { IUser, IUserProgram } from "../models/user.model";
 
 import moment from 'moment';
 
@@ -81,8 +82,30 @@ export const getProgramsByUser = CatchAsyncError(
     }
 
     try {
-      const programs: ProgramWithWeek[] = await getProgamsByUserId(userId.toString());
-      
+      const user = await User.findById(userId);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+
+      const programs = await Promise.all(
+        user.programs.map(async (userProgram) => {
+          const program = await Program.findById(userProgram.programId);
+          if (!program) {
+            throw new Error(`Program not found: ${userProgram.programId}`);
+          }
+
+          const purchaseDate = moment(userProgram.purchasedDay).startOf('day');
+          const currentDate = moment().startOf('day');
+          const weeksDiff = currentDate.diff(purchaseDate, 'weeks');
+          const currentProgramWeek = weeksDiff + 1;
+
+          return {
+            ...program.toObject(),
+            currentProgramWeek
+          };
+        })
+      );
+
       res.status(200).json({
         success: true,
         programs
