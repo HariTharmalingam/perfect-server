@@ -5,6 +5,16 @@ import jwt from "jsonwebtoken";
 
 const emailRegexPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+
+
+//NOUVEAU
+
+
+export interface IUserProgram {
+  programId: string;
+  purchasedDay: Date;
+}
+
 export interface IUser extends Document {
   name: string;
   email: string;
@@ -15,8 +25,9 @@ export interface IUser extends Document {
   };
   role: string;
   isVerified: boolean;
-  programs: Array<{ programId: string, purchasedDay : Date }>;
-  activationDate: Date;
+  programs: IUserProgram[];
+  createdAt: Date;
+  updatedAt: Date;  
   comparePassword: (password: string) => Promise<boolean>;
   SignAccessToken: () => string;
   SignRefreshToken: () => string;
@@ -60,6 +71,10 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+
+
+//FIN
 
 // Hash Password before saving
 userSchema.pre<IUser>("save", async function (next) {

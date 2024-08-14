@@ -5,9 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProgamsByUserId = exports.getAllProgramsService = exports.createProgram = void 0;
 const program_model_1 = __importDefault(require("../models/program.model"));
+const program_model_2 = __importDefault(require("../models/program.model"));
 const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
-const moment_1 = __importDefault(require("moment"));
-const redis_1 = require("../utils/redis");
+const user_model_1 = __importDefault(require("../models/user.model"));
 // create program
 exports.createProgram = (0, catchAsyncErrors_1.CatchAsyncError)(async (data, res) => {
     const program = await program_model_1.default.create(data);
@@ -26,20 +26,25 @@ const getAllProgramsService = async (res) => {
 };
 exports.getAllProgramsService = getAllProgramsService;
 //Get Programs of Users
-const getProgamsByUserId = async (id, res) => {
-    const userJson = await redis_1.redis.get(id);
-    if (userJson) {
-        const user = JSON.parse(userJson);
-        const array = [];
-        await Promise.all(user.programs.map(async (element) => {
-            array.push(await program_model_1.default.findById(element.programId));
-            const currentProgramWeek = (0, moment_1.default)().diff(element.purchasedDay, 'week');
-            array.push({ "currentProgramWeek": currentProgramWeek });
-        }));
-        res.status(201).json({
-            success: true,
-            array,
-        });
+const getProgamsByUserId = async (userId) => {
+    const user = await user_model_1.default.findById(userId);
+    if (!user) {
+        throw new Error("User not found");
     }
+    const programsWithWeeks = await Promise.all(user.programs.map(async (userProgram) => {
+        const program = await program_model_2.default.findById(userProgram.programId);
+        if (!program) {
+            throw new Error(`Program not found: ${userProgram.programId}`);
+        }
+        const purchaseDate = userProgram.purchasedDay;
+        const currentDate = new Date();
+        const diffTime = Math.abs(currentDate.getTime() - purchaseDate.getTime());
+        const currentProgramWeek = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+        return {
+            program,
+            currentProgramWeek
+        };
+    }));
+    return programsWithWeeks;
 };
 exports.getProgamsByUserId = getProgamsByUserId;

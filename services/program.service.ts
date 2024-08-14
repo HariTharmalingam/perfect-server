@@ -1,8 +1,10 @@
 import { Response } from "express";
-import ProgramModel from "../models/program.model";
+import ProgramModel  from "../models/program.model";
+import Program, { IProgram } from "../models/program.model";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import moment from 'moment';
 import { redis } from "../utils/redis";
+import User, { IUser, IUserProgram } from "../models/user.model";
 
 // create program
 export const createProgram = CatchAsyncError(async(data:any,res:Response)=>{
@@ -23,28 +25,35 @@ export const getAllProgramsService = async (res: Response) => {
     });
   };
   
-
-//Get Programs of Users
-export const getProgamsByUserId = async (id: string,  res: Response) => {
-  const userJson = await redis.get(id);
-
-  if (userJson) {
-    const user = JSON.parse(userJson);
-
-    const array:any = [];
-
-    await Promise.all(user.programs.map(async (element:any) => {
-      array.push(await ProgramModel.findById(element.programId))
-      const currentProgramWeek = moment().diff(element.purchasedDay, 'week')
-      array.push({"currentProgramWeek": currentProgramWeek})
-    }))
-
-    res.status(201).json({
-      success: true,
-      array,
-    });
+  interface ProgramWithWeek {
+    program: IProgram;
+    currentProgramWeek: number;
   }
-  
+//Get Programs of Users
+export const getProgamsByUserId = async (userId: string): Promise<ProgramWithWeek[]> => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
 
+  const programsWithWeeks: ProgramWithWeek[] = await Promise.all(
+    user.programs.map(async (userProgram) => {
+      const program = await Program.findById(userProgram.programId);
+      if (!program) {
+        throw new Error(`Program not found: ${userProgram.programId}`);
+      }
+
+      const purchaseDate = userProgram.purchasedDay;
+      const currentDate = new Date();
+      const diffTime = Math.abs(currentDate.getTime() - purchaseDate.getTime());
+      const currentProgramWeek = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+
+      return {
+        program,
+        currentProgramWeek
+      };
+    })
+  );
+
+  return programsWithWeeks;
 };
-

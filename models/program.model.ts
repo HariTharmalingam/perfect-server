@@ -1,5 +1,28 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
-import { IUser } from "./user.model";
+
+interface IWeek {
+  weekNumber: number;
+  sets: number;
+  reps?: string[];
+  rest?: string[];
+  duration?: string[];
+}
+
+interface IExercise {
+  exerciseNumber: number;
+  exerciseName: string;
+  exerciseDescription: string;
+  image: string;
+  weeks: IWeek[];
+}
+
+interface ISession {
+  sessionNumber: number;
+  warmup?: string;
+  instructions: string;
+  sessionType?: string;
+  exercises: IExercise[];
+}
 
 export interface IProgram extends Document {
   id: number;
@@ -7,67 +30,35 @@ export interface IProgram extends Document {
   session: ISession[];
 }
 
-
-interface ISession extends Document {
-  sessionNumber: number
-  warmup?: string
-  instructions: string
-  exercises: IExercises[]
-  sessionType?: string
-}
-interface IExercises {
-  exerciseNumber: number
-  exerciseName: string
-  exerciseDescription: string
-  image: string
-  weeks: IWeeks[]
-}
-
-interface IWeeks {
-  weekNumber: number
-  sets: number
-  reps?: string[]
-  rest?: string[]
-  duration?: string[]
-}
-
-const weeksSchema = new Schema<IWeeks>({
+const WeekSchema: Schema = new Schema({
   weekNumber: Number,
   sets: Number,
-  reps: String,
-  rest: String,
-  duration: String,
+  reps: [String],
+  rest: [String],
+  duration: [String]
 });
 
-const exercisesSchema = new Schema<IExercises>({
+const ExerciseSchema: Schema = new Schema({
   exerciseNumber: Number,
   exerciseName: String,
   exerciseDescription: String,
   image: String,
-  weeks: [weeksSchema],
+  weeks: [WeekSchema]
 });
 
-const sessionSchema = new Schema<ISession>({
+const SessionSchema: Schema = new Schema({
   sessionNumber: Number,
   warmup: String,
   instructions: String,
   sessionType: String,
-  exercises: [exercisesSchema],
+  exercises: [ExerciseSchema]
 });
 
+const ProgramSchema: Schema = new Schema({
+  id: { type: Number, required: true, unique: true },
+  name: { type: String, required: true },
+  session: [SessionSchema]
+});
 
-const programSchema = new Schema<IProgram>({
-  id: {
-    type: Number,
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  session: [sessionSchema],
-},{timestamps: true});
+export default mongoose.model<IProgram>('Program', ProgramSchema);
 
-const ProgramModel: Model<IProgram> = mongoose.model("Program", programSchema);
-
-export default ProgramModel;

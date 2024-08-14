@@ -24,37 +24,30 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const weeksSchema = new mongoose_1.Schema({
+const WeekSchema = new mongoose_1.Schema({
     weekNumber: Number,
     sets: Number,
-    reps: String,
-    rest: String,
-    duration: String,
+    reps: [String],
+    rest: [String],
+    duration: [String]
 });
-const exercisesSchema = new mongoose_1.Schema({
+const ExerciseSchema = new mongoose_1.Schema({
     exerciseNumber: Number,
     exerciseName: String,
     exerciseDescription: String,
     image: String,
-    weeks: [weeksSchema],
+    weeks: [WeekSchema]
 });
-const sessionSchema = new mongoose_1.Schema({
+const SessionSchema = new mongoose_1.Schema({
     sessionNumber: Number,
     warmup: String,
     instructions: String,
     sessionType: String,
-    exercises: [exercisesSchema],
+    exercises: [ExerciseSchema]
 });
-const programSchema = new mongoose_1.Schema({
-    id: {
-        type: Number,
-        required: true,
-    },
-    name: {
-        type: String,
-        required: true,
-    },
-    session: [sessionSchema],
-}, { timestamps: true });
-const ProgramModel = mongoose_1.default.model("Program", programSchema);
-exports.default = ProgramModel;
+const ProgramSchema = new mongoose_1.Schema({
+    id: { type: Number, required: true, unique: true },
+    name: { type: String, required: true },
+    session: [SessionSchema]
+});
+exports.default = mongoose_1.default.model('Program', ProgramSchema);

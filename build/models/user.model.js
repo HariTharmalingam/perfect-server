@@ -43,6 +43,7 @@ const userSchema = new mongoose_1.default.Schema({
     },
     programs: [{ programId: { type: String }, purchasedDay: { type: Date } }],
 }, { timestamps: true });
+//FIN
 // Hash Password before saving
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {

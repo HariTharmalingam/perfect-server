@@ -48,14 +48,13 @@ exports.getAllPrograms = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res
         return next(new ErrorHandler_1.default(error.message, 500));
     }
 });
-// get program content -- only for valid user
 exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
+    const userId = req.user?._id;
+    if (!userId) {
+        return next(new ErrorHandler_1.default("User ID not found", 400));
+    }
     try {
-        const userId = req.user?._id;
-        if (!userId) {
-            return next(new ErrorHandler_1.default("User ID not found", 400));
-        }
-        const programs = await (0, program_service_1.getProgamsByUserId)(userId, res);
+        const programs = await (0, program_service_1.getProgamsByUserId)(userId.toString());
         res.status(200).json({
             success: true,
             programs

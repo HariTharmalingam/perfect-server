@@ -4,6 +4,7 @@ import ErrorHandler from "../utils/ErrorHandler";
 import cloudinary from "cloudinary";
 import { createProgram, getAllProgramsService } from "../services/program.service";
 import ProgramModel from "../models/program.model";
+import Program, { IProgram } from '../models/program.model';
 import CourseModel from "../models/course.model";
 import userModel from "../models/user.model";
 import { redis } from "../utils/redis";
@@ -66,16 +67,22 @@ export const getAllPrograms = CatchAsyncError(
 );
 
 // get program content -- only for valid user
+
+interface ProgramWithWeek {
+  program: IProgram;
+  currentProgramWeek: number;
+}
+
 export const getProgramsByUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId = req.user?._id;
-      if (!userId) {
-        return next(new ErrorHandler("User ID not found", 400));
-      }
-      const programs = await getProgamsByUserId(userId, res);
-      
+    const userId = req.user?._id;
+    if (!userId) {
+      return next(new ErrorHandler("User ID not found", 400));
+    }
 
+    try {
+      const programs: ProgramWithWeek[] = await getProgamsByUserId(userId.toString());
+      
       res.status(200).json({
         success: true,
         programs
