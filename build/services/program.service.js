@@ -7,6 +7,7 @@ exports.getProgamsByUserId = exports.getAllProgramsService = exports.createProgr
 const program_model_1 = __importDefault(require("../models/program.model"));
 const program_model_2 = __importDefault(require("../models/program.model"));
 const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
+const moment_1 = __importDefault(require("moment"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 // create program
 exports.createProgram = (0, catchAsyncErrors_1.CatchAsyncError)(async (data, res) => {
@@ -36,10 +37,12 @@ const getProgamsByUserId = async (userId) => {
         if (!program) {
             throw new Error(`Program not found: ${userProgram.programId}`);
         }
-        const purchaseDate = userProgram.purchasedDay;
-        const currentDate = new Date();
-        const diffTime = Math.abs(currentDate.getTime() - purchaseDate.getTime());
-        const currentProgramWeek = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+        // Utiliser moment pour calculer précisément les semaines écoulées
+        const purchaseDate = (0, moment_1.default)(userProgram.purchasedDay).startOf('day');
+        const currentDate = (0, moment_1.default)().startOf('day');
+        const weeksDiff = currentDate.diff(purchaseDate, 'weeks');
+        // La semaine en cours est le nombre de semaines écoulées + 1
+        const currentProgramWeek = weeksDiff + 1;
         return {
             program,
             currentProgramWeek

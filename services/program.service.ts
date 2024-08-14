@@ -42,11 +42,13 @@ export const getProgamsByUserId = async (userId: string): Promise<ProgramWithWee
       if (!program) {
         throw new Error(`Program not found: ${userProgram.programId}`);
       }
+      // Utiliser moment pour calculer précisément les semaines écoulées
+      const purchaseDate = moment(userProgram.purchasedDay).startOf('day');
+      const currentDate = moment().startOf('day');
+      const weeksDiff = currentDate.diff(purchaseDate, 'weeks');
 
-      const purchaseDate = userProgram.purchasedDay;
-      const currentDate = new Date();
-      const diffTime = Math.abs(currentDate.getTime() - purchaseDate.getTime());
-      const currentProgramWeek = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+      // La semaine en cours est le nombre de semaines écoulées + 1
+      const currentProgramWeek = weeksDiff + 1;
 
       return {
         program,
