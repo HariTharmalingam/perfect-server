@@ -69,9 +69,13 @@ exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
             const currentDate = (0, moment_1.default)().startOf('day');
             const weeksDiff = currentDate.diff(purchaseDate, 'weeks');
             const currentProgramWeek = weeksDiff + 1;
+            // Restructurer le programme
+            const restructuredProgram = restructureProgram(program, currentProgramWeek);
             return {
-                ...program.toObject(),
-                currentProgramWeek
+                _id: program._id,
+                name: program.name,
+                currentProgramWeek,
+                weeks: restructuredProgram
             };
         }));
         res.status(200).json({
@@ -83,3 +87,41 @@ exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
         return next(new ErrorHandler_1.default(error.message, 500));
     }
 });
+function restructureProgram(program, currentProgramWeek) {
+    const weeks = {};
+    program.session.forEach(session => {
+        session.exercises.forEach(exercise => {
+            exercise.weeks.forEach(week => {
+                if (!weeks[week.weekNumber]) {
+                    weeks[week.weekNumber] = [];
+                }
+                const restructuredExercise = {
+                    ...exercise,
+                    sets: week.sets,
+                    reps: week.reps,
+                    rest: week.rest,
+                    duration: week.duration
+                };
+                delete restructuredExercise.weeks;
+                const existingSession = weeks[week.weekNumber].find(s => s.sessionNumber === session.sessionNumber);
+                if (existingSession) {
+                    existingSession.exercises.push(restructuredExercise);
+                }
+                else {
+                    weeks[week.weekNumber].push({
+                        sessionNumber: session.sessionNumber,
+                        warmup: session.warmup,
+                        instructions: session.instructions,
+                        sessionType: session.sessionType,
+                        exercises: [restructuredExercise]
+                    });
+                }
+            });
+        });
+    });
+    return Object.entries(weeks).map(([weekNumber, sessions]) => ({
+        weekNumber: parseInt(weekNumber),
+        isCurrent: parseInt(weekNumber) === currentProgramWeek,
+        sessions
+    })).sort((a, b) => a.weekNumber - b.weekNumber);
+}
