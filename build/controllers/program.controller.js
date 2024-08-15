@@ -88,40 +88,42 @@ exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
     }
 });
 function restructureProgram(program, currentProgramWeek) {
-    const weeks = {};
-    program.session.forEach(session => {
-        session.exercises.forEach(exercise => {
-            exercise.weeks.forEach(week => {
-                if (!weeks[week.weekNumber]) {
-                    weeks[week.weekNumber] = [];
-                }
-                const restructuredExercise = {
-                    ...exercise,
-                    sets: week.sets,
-                    reps: week.reps,
-                    rest: week.rest,
-                    duration: week.duration
-                };
-                delete restructuredExercise.weeks;
-                const existingSession = weeks[week.weekNumber].find(s => s.sessionNumber === session.sessionNumber);
-                if (existingSession) {
-                    existingSession.exercises.push(restructuredExercise);
-                }
-                else {
-                    weeks[week.weekNumber].push({
-                        sessionNumber: session.sessionNumber,
-                        warmup: session.warmup,
-                        instructions: session.instructions,
-                        sessionType: session.sessionType,
-                        exercises: [restructuredExercise]
-                    });
-                }
+    const restructuredWeeks = [];
+    program.month.forEach((month, monthIndex) => {
+        month.session.forEach((session, sessionIndex) => {
+            session.exercise.forEach(exercise => {
+                exercise.week.forEach((week, weekIndex) => {
+                    const absoluteWeekNumber = monthIndex * 4 + weekIndex + 1; // Assuming 4 weeks per month
+                    if (!restructuredWeeks[absoluteWeekNumber - 1]) {
+                        restructuredWeeks[absoluteWeekNumber - 1] = {
+                            weekNumber: absoluteWeekNumber,
+                            isCurrent: absoluteWeekNumber === currentProgramWeek,
+                            sessions: []
+                        };
+                    }
+                    const restructuredExercise = {
+                        name: exercise.name,
+                        instructions: exercise.instructions,
+                        image: exercise.image,
+                        sets: week.sets,
+                        reps: week.reps,
+                        rest: week.rest,
+                        duration: week.duration,
+                        distance: week.distance
+                    };
+                    let restructuredSession = restructuredWeeks[absoluteWeekNumber - 1].sessions.find(s => s.warmup === session.warmup && s.instructions === session.instructions);
+                    if (!restructuredSession) {
+                        restructuredSession = {
+                            warmup: session.warmup,
+                            instructions: session.instructions,
+                            exercises: []
+                        };
+                        restructuredWeeks[absoluteWeekNumber - 1].sessions.push(restructuredSession);
+                    }
+                    restructuredSession.exercises.push(restructuredExercise);
+                });
             });
         });
     });
-    return Object.entries(weeks).map(([weekNumber, sessions]) => ({
-        weekNumber: parseInt(weekNumber),
-        isCurrent: parseInt(weekNumber) === currentProgramWeek,
-        sessions
-    })).sort((a, b) => a.weekNumber - b.weekNumber);
+    return restructuredWeeks.filter(Boolean).sort((a, b) => a.weekNumber - b.weekNumber);
 }

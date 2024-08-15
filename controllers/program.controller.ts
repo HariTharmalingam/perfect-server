@@ -120,45 +120,23 @@ export const getProgramsByUser = CatchAsyncError(
     }
   }
 );
-interface Week {
-  weekNumber: number;
-  sets: number;
-  reps?: string[];
-  rest?: string[];
-  duration?: string[];
-}
-
-interface Exercise {
-  exerciseNumber: number;
-  exerciseName: string;
-  exerciseDescription: string;
-  image: string;
-  weeks: Week[];
-}
-
-interface Session {
-  sessionNumber: number;
-  warmup?: string;
-  instructions: string;
-  sessionType?: string;
-  exercises: Exercise[];
-}
-
-interface Program {
-  _id: string;
-  id: number;
+interface RestructuredExercise {
   name: string;
-  session: Session[];
-}
-
-interface RestructuredExercise extends Omit<Exercise, 'weeks'> {
+  instructions: string[];
+  image: {
+    public_id: string;
+    url: string;
+  };
   sets: number;
   reps?: string[];
   rest?: string[];
   duration?: string[];
+  distance?: string[];
 }
 
-interface RestructuredSession extends Omit<Session, 'exercises'> {
+interface RestructuredSession {
+  warmup: string;
+  instructions: string;
   exercises: RestructuredExercise[];
 }
 
@@ -168,44 +146,52 @@ interface RestructuredWeek {
   sessions: RestructuredSession[];
 }
 
-function restructureProgram(program: Program, currentProgramWeek: number): RestructuredWeek[] {
-  const weeks: { [key: number]: RestructuredSession[] } = {};
+function restructureProgram(program: IProgram, currentProgramWeek: number): RestructuredWeek[] {
+  const restructuredWeeks: RestructuredWeek[] = [];
 
-  program.session.forEach(session => {
-    session.exercises.forEach(exercise => {
-      exercise.weeks.forEach(week => {
-        if (!weeks[week.weekNumber]) {
-          weeks[week.weekNumber] = [];
-        }
+  program.month.forEach((month, monthIndex) => {
+    month.session.forEach((session, sessionIndex) => {
+      session.exercise.forEach(exercise => {
+        exercise.week.forEach((week, weekIndex) => {
+          const absoluteWeekNumber = monthIndex * 4 + weekIndex + 1; // Assuming 4 weeks per month
 
-        const restructuredExercise: RestructuredExercise = {
-          ...exercise,
-          sets: week.sets,
-          reps: week.reps,
-          rest: week.rest,
-          duration: week.duration
-        };
-        delete (restructuredExercise as any).weeks;
+          if (!restructuredWeeks[absoluteWeekNumber - 1]) {
+            restructuredWeeks[absoluteWeekNumber - 1] = {
+              weekNumber: absoluteWeekNumber,
+              isCurrent: absoluteWeekNumber === currentProgramWeek,
+              sessions: []
+            };
+          }
 
-        const existingSession = weeks[week.weekNumber].find(s => s.sessionNumber === session.sessionNumber);
-        if (existingSession) {
-          existingSession.exercises.push(restructuredExercise);
-        } else {
-          weeks[week.weekNumber].push({
-            sessionNumber: session.sessionNumber,
-            warmup: session.warmup,
-            instructions: session.instructions,
-            sessionType: session.sessionType,
-            exercises: [restructuredExercise]
-          });
-        }
+          const restructuredExercise: RestructuredExercise = {
+            name: exercise.name,
+            instructions: exercise.instructions,
+            image: exercise.image,
+            sets: week.sets,
+            reps: week.reps,
+            rest: week.rest,
+            duration: week.duration,
+            distance: week.distance
+          };
+
+          let restructuredSession = restructuredWeeks[absoluteWeekNumber - 1].sessions.find(
+            s => s.warmup === session.warmup && s.instructions === session.instructions
+          );
+
+          if (!restructuredSession) {
+            restructuredSession = {
+              warmup: session.warmup,
+              instructions: session.instructions,
+              exercises: []
+            };
+            restructuredWeeks[absoluteWeekNumber - 1].sessions.push(restructuredSession);
+          }
+
+          restructuredSession.exercises.push(restructuredExercise);
+        });
       });
     });
   });
 
-  return Object.entries(weeks).map(([weekNumber, sessions]) => ({
-    weekNumber: parseInt(weekNumber),
-    isCurrent: parseInt(weekNumber) === currentProgramWeek,
-    sessions
-  })).sort((a, b) => a.weekNumber - b.weekNumber);
+  return restructuredWeeks.filter(Boolean).sort((a, b) => a.weekNumber - b.weekNumber);
 }
