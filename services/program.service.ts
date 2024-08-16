@@ -53,7 +53,7 @@ export const getAllProgramsService = async (res: Response) => {
     isCurrent: boolean;
     sessions: RestructuredSession[];
   }
-  
+
   export async function restructureProgram(program: IProgram, startDate: Date): Promise<RestructuredWeek[]> {
     const restructuredWeeks: RestructuredWeek[] = [];
     const currentDate = moment();
@@ -78,9 +78,13 @@ export const getAllProgramsService = async (res: Response) => {
   
             // Gestion du warmup
             let warmup: IWarmup | null = null;
-            if (session.warmupId && mongoose.Types.ObjectId.isValid(session.warmupId)) {
+            if (session.warmupId) {
               try {
-                warmup = await Warmup.findById(session.warmupId).exec();
+                const warmupId = typeof session.warmupId === 'string' 
+                  ? new mongoose.Types.ObjectId(session.warmupId)
+                  : session.warmupId;
+                
+                warmup = await Warmup.findById(warmupId).exec();
                 if (!warmup) {
                   console.warn(`Warmup with id ${session.warmupId} not found`);
                 }
@@ -121,4 +125,3 @@ export const getAllProgramsService = async (res: Response) => {
   
     return restructuredWeeks.sort((a, b) => a.weekNumber - b.weekNumber);
   }
-  

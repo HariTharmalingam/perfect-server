@@ -46,9 +46,12 @@ async function restructureProgram(program, startDate) {
                     };
                     // Gestion du warmup
                     let warmup = null;
-                    if (session.warmupId && mongoose_1.default.Types.ObjectId.isValid(session.warmupId)) {
+                    if (session.warmupId) {
                         try {
-                            warmup = await warmup_model_1.Warmup.findById(session.warmupId).exec();
+                            const warmupId = typeof session.warmupId === 'string'
+                                ? new mongoose_1.default.Types.ObjectId(session.warmupId)
+                                : session.warmupId;
+                            warmup = await warmup_model_1.Warmup.findById(warmupId).exec();
                             if (!warmup) {
                                 console.warn(`Warmup with id ${session.warmupId} not found`);
                             }
