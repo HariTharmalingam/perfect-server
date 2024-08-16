@@ -42,9 +42,10 @@ function restructureProgram(program, startDate) {
                         isCurrent: globalWeekIndex === currentProgramWeek,
                         sessions: []
                     };
-                    const warmup = session.warmupId;
-                    const restructuredSession = {
-                        warmup: warmup ? {
+                    let restructuredWarmup = null;
+                    if (session.warmupId && typeof session.warmupId !== 'string') {
+                        const warmup = session.warmupId;
+                        restructuredWarmup = {
                             name: warmup.name,
                             exercise: warmup.exercise.map(ex => ({
                                 name: ex.name,
@@ -52,7 +53,10 @@ function restructureProgram(program, startDate) {
                                 image: ex.image,
                                 duration: ex.duration
                             }))
-                        } : null,
+                        };
+                    }
+                    const restructuredSession = {
+                        warmup: restructuredWarmup,
                         instructions: session.instructions,
                         exercises: []
                     };

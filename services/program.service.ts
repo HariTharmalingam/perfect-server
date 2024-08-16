@@ -104,10 +104,11 @@ export const getAllProgramsService = async (res: Response) => {
               sessions: []
             };
   
-              const warmup = session.warmupId as unknown as IWarmup;
+            let restructuredWarmup: RestructuredWarmup | null = null;
   
-            const restructuredSession: RestructuredSession = {
-              warmup: warmup ? {
+            if (session.warmupId && typeof session.warmupId !== 'string') {
+              const warmup = session.warmupId as IWarmup;
+              restructuredWarmup = {
                 name: warmup.name,
                 exercise: warmup.exercise.map(ex => ({
                   name: ex.name,
@@ -115,7 +116,11 @@ export const getAllProgramsService = async (res: Response) => {
                   image: ex.image,
                   duration: ex.duration
                 }))
-              } : null,
+              };
+            }
+  
+            const restructuredSession: RestructuredSession = {
+              warmup: restructuredWarmup,
               instructions: session.instructions,
               exercises: []
             };

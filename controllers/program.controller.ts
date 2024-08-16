@@ -34,7 +34,14 @@ export const getProgramsByUser = CatchAsyncError(
     }
 
     try {
-      const user = await User.findById(userId).populate('programs.programId');
+      const user = await User.findById(userId).populate({
+        path: 'programs.programId',
+        populate: {
+          path: 'month.session.warmupId',
+          model: 'Warmup'
+        }
+      });
+      
       if (!user) {
         return next(new ErrorHandler("User not found", 404));
       }
