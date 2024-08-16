@@ -41,9 +41,37 @@ export const getAllProgramsService = async (res: Response) => {
     duration?: string[];
     distance?: string[];
   }
+  interface IImage {
+    public_id: string;
+    url: string;
+  }
+  
+  interface IWarmupExercise {
+    name: string;
+    instructions: string[];
+    image: IImage;
+    duration: string;
+  }
+  
+  // Interface pour le warmup restructuré (sans les champs Mongoose)
+  interface RestructuredWarmup {
+    name: string;
+    exercise: IWarmupExercise[];
+  }
+  
+  interface RestructuredExercise {
+    name: string;
+    instructions: string[];
+    image: IImage;
+    sets: number;
+    reps?: string[];
+    rest?: string[];
+    duration?: string[];
+    distance?: string[];
+  }
   
   interface RestructuredSession {
-    warmup: IWarmup | null;
+    warmup: RestructuredWarmup | null;
     instructions: string;
     exercises: RestructuredExercise[];
   }
@@ -54,7 +82,7 @@ export const getAllProgramsService = async (res: Response) => {
     sessions: RestructuredSession[];
   }
 
-  export async function restructureProgram(program: IProgram, startDate: Date): Promise<RestructuredWeek[]> {
+  export function restructureProgram(program: IProgram, startDate: Date): RestructuredWeek[] {
     const restructuredWeeks: RestructuredWeek[] = [];
     const currentDate = moment();
     const startMoment = moment(startDate);
@@ -76,25 +104,18 @@ export const getAllProgramsService = async (res: Response) => {
               sessions: []
             };
   
-            // Gestion du warmup
-            let warmup: IWarmup | null = null;
-            if (session.warmupId) {
-              try {
-                const warmupId = typeof session.warmupId === 'string' 
-                  ? new mongoose.Types.ObjectId(session.warmupId)
-                  : session.warmupId;
-                
-                warmup = await Warmup.findById(warmupId).exec();
-                if (!warmup) {
-                  console.warn(`Warmup with id ${session.warmupId} not found`);
-                }
-              } catch (error) {
-                console.error(`Error fetching warmup with id ${session.warmupId}:`, error);
-              }
-            }
+              const warmup = session.warmupId as unknown as IWarmup;
   
             const restructuredSession: RestructuredSession = {
-              warmup: warmup,
+              warmup: warmup ? {
+                name: warmup.name,
+                exercise: warmup.exercise.map(ex => ({
+                  name: ex.name,
+                  instructions: ex.instructions,
+                  image: ex.image,
+                  duration: ex.duration
+                }))
+              } : null,
               instructions: session.instructions,
               exercises: []
             };
