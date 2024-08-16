@@ -28,41 +28,23 @@ export const getAllProgramsService = async (res: Response) => {
   };
   
 
-  interface RestructuredExercise {
-    name: string;
-    instructions: string[];
-    image: {
-      public_id: string;
-      url: string;
-    };
-    sets: number;
-    reps?: string[];
-    rest?: string[];
-    duration?: string[];
-    distance?: string[];
-  }
   interface IImage {
     public_id: string;
     url: string;
   }
   
-  interface IWarmupExercise {
+  // Interfaces pour les exercices
+  interface IExerciseBase {
     name: string;
     instructions: string[];
     image: IImage;
+  }
+  
+  interface IWarmupExercise extends IExerciseBase {
     duration: string;
   }
   
-  // Interface pour le warmup restructuré (sans les champs Mongoose)
-  interface RestructuredWarmup {
-    name: string;
-    exercise: IWarmupExercise[];
-  }
-  
-  interface RestructuredExercise {
-    name: string;
-    instructions: string[];
-    image: IImage;
+  interface RestructuredExercise extends IExerciseBase {
     sets: number;
     reps?: string[];
     rest?: string[];
@@ -70,8 +52,15 @@ export const getAllProgramsService = async (res: Response) => {
     distance?: string[];
   }
   
+  // Interface pour le warmup restructuré
+  interface RestructuredWarmup {
+    name: string;
+    exercise: IWarmupExercise[];
+  }
+  
+  // Interfaces pour la structure restructurée du programme
   interface RestructuredSession {
-    warmup: RestructuredWarmup | null;
+    warmup: RestructuredWarmup | null; // Changé de warmupId à warmup
     instructions: string;
     exercises: RestructuredExercise[];
   }
@@ -81,7 +70,6 @@ export const getAllProgramsService = async (res: Response) => {
     isCurrent: boolean;
     sessions: RestructuredSession[];
   }
-
   export function restructureProgram(program: IProgram, startDate: Date): RestructuredWeek[] {
     const restructuredWeeks: RestructuredWeek[] = [];
     const currentDate = moment();

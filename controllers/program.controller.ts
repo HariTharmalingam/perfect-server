@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import ErrorHandler from "../utils/ErrorHandler";
-import { Warmup } from "../models/warmup.model";
+import { IWarmup, Warmup } from "../models/warmup.model";
 import ProgramModel from "../models/program.model";
 import { IProgram } from '../models/program.model';
 import User, { IUserProgram } from "../models/user.model";
