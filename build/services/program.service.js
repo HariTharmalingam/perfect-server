@@ -44,6 +44,7 @@ function restructureProgram(program, startDate) {
                     };
                     let restructuredWarmup = null;
                     if (session.warmupId && typeof session.warmupId !== 'string') {
+                        // Si warmupId n'est pas une chaîne, c'est qu'il a été peuplé
                         const warmup = session.warmupId;
                         restructuredWarmup = {
                             name: warmup.name,

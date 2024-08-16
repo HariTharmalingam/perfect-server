@@ -7,6 +7,7 @@ import User, { IUserProgram } from "../models/user.model";
 import mongoose from 'mongoose';
 import moment from 'moment';
 import { restructureProgram } from "../services/program.service";
+import { Warmup } from "../models/warmup.model";
 
 // get all programs --- without purchasing
 export const getAllPrograms = CatchAsyncError(
@@ -38,10 +39,10 @@ export const getProgramsByUser = CatchAsyncError(
         path: 'programs.programId',
         populate: {
           path: 'month.session.warmupId',
-          model: 'Warmup'
+          model: Warmup
         }
       });
-      
+
       if (!user) {
         return next(new ErrorHandler("User not found", 404));
       }

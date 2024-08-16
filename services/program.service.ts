@@ -107,7 +107,8 @@ export const getAllProgramsService = async (res: Response) => {
             let restructuredWarmup: RestructuredWarmup | null = null;
   
             if (session.warmupId && typeof session.warmupId !== 'string') {
-              const warmup = session.warmupId as IWarmup;
+              // Si warmupId n'est pas une chaîne, c'est qu'il a été peuplé
+              const warmup = session.warmupId as unknown as IWarmup;
               restructuredWarmup = {
                 name: warmup.name,
                 exercise: warmup.exercise.map(ex => ({
@@ -118,7 +119,7 @@ export const getAllProgramsService = async (res: Response) => {
                 }))
               };
             }
-  
+      
             const restructuredSession: RestructuredSession = {
               warmup: restructuredWarmup,
               instructions: session.instructions,

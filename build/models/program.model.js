@@ -43,7 +43,7 @@ const ExerciseSchema = new mongoose_1.Schema({
 });
 const SessionSchema = new mongoose_1.Schema({
     warmupId: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
+        type: String,
         ref: 'Warmup'
     },
     instructions: String,

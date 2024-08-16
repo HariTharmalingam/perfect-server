@@ -58,9 +58,9 @@ const ExerciseSchema: Schema = new Schema({
 
 const SessionSchema: Schema = new Schema({
   warmupId: { 
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: 'Warmup'
-  },
+  },  
   instructions: String,
   exercise: [ExerciseSchema]
 });
