@@ -5,14 +5,10 @@ import jwt from "jsonwebtoken";
 
 const emailRegexPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-
-
-//NOUVEAU
-
-
-export interface IUserProgram {
-  programId: string;
+export interface IUserProgram  {
+  programId: String,
   purchasedDay: Date;
+  startDate: Date;
 }
 
 export interface IUser extends Document {
@@ -67,14 +63,14 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    programs: [{ programId: { type: String }, purchasedDay: {type : Date} }],
+    programs: [{
+      programId: { type: String, ref: 'Program' },
+      purchasedDay: { type: Date, default: Date.now },
+      startDate: { type: Date }
+    }]
   },
   { timestamps: true }
 );
-
-
-
-//FIN
 
 // Hash Password before saving
 userSchema.pre<IUser>("save", async function (next) {
@@ -105,6 +101,8 @@ userSchema.methods.comparePassword = async function (
 ): Promise<boolean> {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+// Ajout d'un index pour améliorer les performances des requêtes
+userSchema.index({ programId: 1 });
 
 const userModel: Model<IUser> = mongoose.model("User", userSchema);
 

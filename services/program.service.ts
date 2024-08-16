@@ -5,6 +5,8 @@ import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import moment from 'moment';
 import { redis } from "../utils/redis";
 import User, { IUser, IUserProgram } from "../models/user.model";
+import {Warmup, IWarmup } from "../models/warmup.model";
+import mongoose from 'mongoose';
 
 // create program
 export const createProgram = CatchAsyncError(async(data:any,res:Response)=>{
@@ -25,37 +27,98 @@ export const getAllProgramsService = async (res: Response) => {
     });
   };
   
-  interface ProgramWithWeek {
-    program: IProgram;
-    currentProgramWeek: number;
-  }
-//Get Programs of Users
-export const getProgamsByUserId = async (userId: string): Promise<ProgramWithWeek[]> => {
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new Error("User not found");
-  }
 
-  const programsWithWeeks: ProgramWithWeek[] = await Promise.all(
-    user.programs.map(async (userProgram) => {
-      const program = await Program.findById(userProgram.programId);
-      if (!program) {
-        throw new Error(`Program not found: ${userProgram.programId}`);
+  interface RestructuredExercise {
+    name: string;
+    instructions: string[];
+    image: {
+      public_id: string;
+      url: string;
+    };
+    sets: number;
+    reps?: string[];
+    rest?: string[];
+    duration?: string[];
+    distance?: string[];
+  }
+  
+  interface RestructuredSession {
+    warmup: IWarmup | null;
+    instructions: string;
+    exercises: RestructuredExercise[];
+  }
+  
+  interface RestructuredWeek {
+    weekNumber: number;
+    isCurrent: boolean;
+    sessions: RestructuredSession[];
+  }
+  
+  export async function restructureProgram(program: IProgram, startDate: Date): Promise<RestructuredWeek[]> {
+    const restructuredWeeks: RestructuredWeek[] = [];
+    const currentDate = moment();
+    const startMoment = moment(startDate);
+    const currentProgramWeek = currentDate.diff(startMoment, 'weeks') + 1;
+  
+    let globalWeekIndex = 0;
+  
+    for (const month of program.month) {
+      for (const session of month.session) {
+        const weeksInSession = session.exercise[0]?.week.length || 0;
+  
+        for (let weekIndex = 0; weekIndex < weeksInSession; weekIndex++) {
+          globalWeekIndex++;
+  
+          if (globalWeekIndex <= currentProgramWeek) {
+            const restructuredWeek: RestructuredWeek = {
+              weekNumber: globalWeekIndex,
+              isCurrent: globalWeekIndex === currentProgramWeek,
+              sessions: []
+            };
+  
+            // Gestion du warmup
+            let warmup: IWarmup | null = null;
+            if (session.warmupId && mongoose.Types.ObjectId.isValid(session.warmupId)) {
+              try {
+                warmup = await Warmup.findById(session.warmupId).exec();
+                if (!warmup) {
+                  console.warn(`Warmup with id ${session.warmupId} not found`);
+                }
+              } catch (error) {
+                console.error(`Error fetching warmup with id ${session.warmupId}:`, error);
+              }
+            }
+  
+            const restructuredSession: RestructuredSession = {
+              warmup: warmup,
+              instructions: session.instructions,
+              exercises: []
+            };
+  
+            for (const exercise of session.exercise) {
+              if (weekIndex < exercise.week.length) {
+                const weekData = exercise.week[weekIndex];
+                const restructuredExercise: RestructuredExercise = {
+                  name: exercise.name,
+                  instructions: exercise.instructions,
+                  image: exercise.image,
+                  sets: weekData.sets,
+                  reps: weekData.reps,
+                  rest: weekData.rest,
+                  duration: weekData.duration,
+                  distance: weekData.distance
+                };
+                restructuredSession.exercises.push(restructuredExercise);
+              }
+            }
+  
+            restructuredWeek.sessions.push(restructuredSession);
+            restructuredWeeks.push(restructuredWeek);
+          }
+        }
       }
-      // Utiliser moment pour calculer précisément les semaines écoulées
-      const purchaseDate = moment(userProgram.purchasedDay).startOf('day');
-      const currentDate = moment().startOf('day');
-      const weeksDiff = currentDate.diff(purchaseDate, 'weeks');
-
-      // La semaine en cours est le nombre de semaines écoulées + 1
-      const currentProgramWeek = weeksDiff + 1;
-
-      return {
-        program,
-        currentProgramWeek
-      };
-    })
-  );
-
-  return programsWithWeeks;
-};
+    }
+  
+    return restructuredWeeks.sort((a, b) => a.weekNumber - b.weekNumber);
+  }
+  

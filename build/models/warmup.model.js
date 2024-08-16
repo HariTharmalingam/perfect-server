@@ -23,41 +23,24 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Warmup = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+// Schéma pour l'image
 const ImageSchema = new mongoose_1.Schema({
-    public_id: String,
-    url: String
+    public_id: { type: String, default: '' },
+    url: { type: String, default: '' }
 });
-const WeekSchema = new mongoose_1.Schema({
-    sets: { type: Number, required: true },
-    reps: [String],
-    rest: [String],
-    duration: [String],
-    distance: [String]
-}, { _id: false });
+// Schéma pour un exercice
 const ExerciseSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
-    instructions: [String],
-    image: ImageSchema,
-    week: [WeekSchema]
+    instructions: { type: [String], required: true },
+    image: { type: ImageSchema, required: true },
+    duration: { type: String, required: true }
 });
-const SessionSchema = new mongoose_1.Schema({
-    warmupId: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
-        ref: 'Warmup'
-    },
-    instructions: String,
-    exercise: [ExerciseSchema]
-});
-const MonthSchema = new mongoose_1.Schema({
-    index: { type: Number, required: true },
-    session: [SessionSchema]
-});
-const ProgramSchema = new mongoose_1.Schema({
+// Schéma principal pour le warmup
+const WarmupSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
-    duration: { type: Number, required: true },
-    month: [MonthSchema]
+    exercise: { type: [ExerciseSchema], required: true }
 });
-ProgramSchema.index({ warmupId: 1 });
-const ProgramModel = mongoose_1.default.model('Program', ProgramSchema);
-exports.default = ProgramModel;
+// Créer et exporter le modèle
+exports.Warmup = mongoose_1.default.model('Warmup', WarmupSchema);

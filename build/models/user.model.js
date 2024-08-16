@@ -41,9 +41,12 @@ const userSchema = new mongoose_1.default.Schema({
         type: Boolean,
         default: false,
     },
-    programs: [{ programId: { type: String }, purchasedDay: { type: Date } }],
+    programs: [{
+            programId: { type: String, ref: 'Program' },
+            purchasedDay: { type: Date, default: Date.now },
+            startDate: { type: Date }
+        }]
 }, { timestamps: true });
-//FIN
 // Hash Password before saving
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {
@@ -68,5 +71,7 @@ userSchema.methods.SignRefreshToken = function () {
 userSchema.methods.comparePassword = async function (enteredPassword) {
     return await bcryptjs_1.default.compare(enteredPassword, this.password);
 };
+// Ajout d'un index pour améliorer les performances des requêtes
+userSchema.index({ programId: 1 });
 const userModel = mongoose_1.default.model("User", userSchema);
 exports.default = userModel;

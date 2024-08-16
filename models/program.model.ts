@@ -21,17 +21,18 @@ interface IExercise {
 }
 
 interface ISession {
-  warmup: string;
+  warmupId:  string;
   instructions: string;
   exercise: IExercise[];
 }
 
 interface IMonth {
+  index: number;
   session: ISession[];
 }
-
 export interface IProgram extends Document {
   name: string;
+  duration: number; 
   month: IMonth[];
 }
 
@@ -56,19 +57,25 @@ const ExerciseSchema: Schema = new Schema({
 });
 
 const SessionSchema: Schema = new Schema({
-  warmup: String,
+  warmupId: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Warmup'
+  },
   instructions: String,
   exercise: [ExerciseSchema]
 });
 
 const MonthSchema: Schema = new Schema({
+  index: { type: Number, required: true },
   session: [SessionSchema]
 });
 
 const ProgramSchema: Schema = new Schema({
   name: { type: String, required: true },
+  duration: { type: Number, required: true },
   month: [MonthSchema]
 });
+ProgramSchema.index({ warmupId: 1 });
 
 const ProgramModel = mongoose.model<IProgram>('Program', ProgramSchema);
 
