@@ -11,7 +11,6 @@ const user_model_1 = __importDefault(require("../models/user.model"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const moment_1 = __importDefault(require("moment"));
 const program_service_1 = require("../services/program.service");
-const warmup_model_1 = require("../models/warmup.model");
 // get all programs --- without purchasing
 exports.getAllPrograms = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     try {
@@ -36,7 +35,7 @@ exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
             path: 'programs.programId',
             populate: {
                 path: 'month.session.warmupId',
-                model: warmup_model_1.Warmup
+                model: 'Warmup'
             }
         });
         if (!user) {

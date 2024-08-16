@@ -39,7 +39,7 @@ export const getProgramsByUser = CatchAsyncError(
         path: 'programs.programId',
         populate: {
           path: 'month.session.warmupId',
-          model: Warmup
+          model: 'Warmup'
         }
       });
 
