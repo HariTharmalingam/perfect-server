@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProgramsByUser = exports.getAllPrograms = void 0;
 const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
 const ErrorHandler_1 = __importDefault(require("../utils/ErrorHandler"));
+const warmup_model_1 = require("../models/warmup.model");
 const program_model_1 = __importDefault(require("../models/program.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -35,7 +36,7 @@ exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
             path: 'programs.programId',
             populate: {
                 path: 'month.session.warmupId',
-                model: 'Warmup'
+                model: warmup_model_1.Warmup
             }
         });
         if (!user) {
