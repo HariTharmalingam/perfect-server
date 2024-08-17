@@ -70,7 +70,7 @@ export const getAllProgramsService = async (res: Response) => {
     isCurrent: boolean;
     sessions: RestructuredSession[];
   }
-  export function restructureProgram(program: IProgram, startDate: Date): RestructuredWeek[] {
+  export async function restructureProgram(program: IProgram, startDate: Date): Promise<RestructuredWeek[]> {
     const restructuredWeeks: RestructuredWeek[] = [];
     const currentDate = moment();
     const startMoment = moment(startDate);
@@ -94,18 +94,25 @@ export const getAllProgramsService = async (res: Response) => {
   
             let restructuredWarmup: RestructuredWarmup | null = null;
   
-            if (session.warmupId && typeof session.warmupId !== 'string') {
-              // Si warmupId n'est pas une chaîne, c'est qu'il a été peuplé
-              const warmup = session.warmupId as unknown as IWarmup;
-              restructuredWarmup = {
-                name: warmup.name,
-                exercise: warmup.exercise.map(ex => ({
-                  name: ex.name,
-                  instructions: ex.instructions,
-                  image: ex.image,
-                  duration: ex.duration
-                }))
-              };
+            if (session.warmupId) {
+              let warmup: IWarmup | null = null;
+              if (typeof session.warmupId === 'string') {
+                warmup = await Warmup.findById(session.warmupId).lean();
+              } else {
+                warmup = session.warmupId as IWarmup;
+              }
+              
+              if (warmup) {
+                restructuredWarmup = {
+                  name: warmup.name,
+                  exercise: warmup.exercise.map(ex => ({
+                    name: ex.name,
+                    instructions: ex.instructions,
+                    image: ex.image,
+                    duration: ex.duration
+                  }))
+                };
+              }
             }
       
             const restructuredSession: RestructuredSession = {

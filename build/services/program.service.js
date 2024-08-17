@@ -8,6 +8,7 @@ exports.restructureProgram = restructureProgram;
 const program_model_1 = __importDefault(require("../models/program.model"));
 const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
 const moment_1 = __importDefault(require("moment"));
+const warmup_model_1 = require("../models/warmup.model");
 // create program
 exports.createProgram = (0, catchAsyncErrors_1.CatchAsyncError)(async (data, res) => {
     const program = await program_model_1.default.create(data);
@@ -25,7 +26,7 @@ const getAllProgramsService = async (res) => {
     });
 };
 exports.getAllProgramsService = getAllProgramsService;
-function restructureProgram(program, startDate) {
+async function restructureProgram(program, startDate) {
     const restructuredWeeks = [];
     const currentDate = (0, moment_1.default)();
     const startMoment = (0, moment_1.default)(startDate);
@@ -43,18 +44,25 @@ function restructureProgram(program, startDate) {
                         sessions: []
                     };
                     let restructuredWarmup = null;
-                    if (session.warmupId && typeof session.warmupId !== 'string') {
-                        // Si warmupId n'est pas une chaîne, c'est qu'il a été peuplé
-                        const warmup = session.warmupId;
-                        restructuredWarmup = {
-                            name: warmup.name,
-                            exercise: warmup.exercise.map(ex => ({
-                                name: ex.name,
-                                instructions: ex.instructions,
-                                image: ex.image,
-                                duration: ex.duration
-                            }))
-                        };
+                    if (session.warmupId) {
+                        let warmup = null;
+                        if (typeof session.warmupId === 'string') {
+                            warmup = await warmup_model_1.Warmup.findById(session.warmupId).lean();
+                        }
+                        else {
+                            warmup = session.warmupId;
+                        }
+                        if (warmup) {
+                            restructuredWarmup = {
+                                name: warmup.name,
+                                exercise: warmup.exercise.map(ex => ({
+                                    name: ex.name,
+                                    instructions: ex.instructions,
+                                    image: ex.image,
+                                    duration: ex.duration
+                                }))
+                            };
+                        }
                     }
                     const restructuredSession = {
                         warmup: restructuredWarmup,
