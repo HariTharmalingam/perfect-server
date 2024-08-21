@@ -20,4 +20,11 @@ initSocketServer(server);
 server.listen(process.env.PORT, () => {
     console.log(`Server is connected with port ${process.env.PORT}`);
     connectDB();
+     // Affichage des routes définies
+  console.log('Routes définies :');
+  app._router.stack.forEach((r: any) => {
+    if (r.route && r.route.path) {
+      console.log(`${r.route.stack[0].method.toUpperCase()} ${r.route.path}`);
+    }
+  });
 });

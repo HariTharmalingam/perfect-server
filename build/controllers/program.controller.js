@@ -48,7 +48,6 @@ exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
         const updatedUserPrograms = [];
         for (let i = 0; i < user.programs.length; i++) {
             const userProgram = user.programs[i];
-            // Vérification de type et conversion
             if (!(userProgram.programId instanceof mongoose_1.default.Types.ObjectId) && 'name' in userProgram.programId) {
                 const program = userProgram.programId;
                 const totalWeeks = program.month.reduce((acc, month) => acc + month.session[0].exercise[0].week.length, 0);
@@ -58,10 +57,11 @@ exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
                         // C'est le premier programme actif
                         const restructuredProgram = await (0, program_service_1.restructureProgram)(program, userProgram.startDate);
                         activeProgram = {
-                            ...program.toObject(),
-                            restructuredWeeks: restructuredProgram,
+                            _id: program._id,
+                            name: program.name,
                             startDate: userProgram.startDate,
-                            endDate: programEndDate.toDate()
+                            endDate: programEndDate.toDate(),
+                            restructuredWeeks: restructuredProgram
                         };
                         updatedUserPrograms.push(userProgram);
                     }
@@ -75,11 +75,8 @@ exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
                         updatedUserPrograms.push(userProgram);
                     }
                 }
-                else if (i === 0) {
-                    // Le premier programme est terminé, mettons à jour la date de début du suivant
-                    if (user.programs[1]) {
-                        user.programs[1].startDate = programEndDate.toDate();
-                    }
+                else {
+                    console.log(`Program ${i} is completed and will be removed`);
                 }
             }
             else {
@@ -87,12 +84,19 @@ exports.getProgramsByUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
             }
         }
         // Mise à jour des programmes de l'utilisateur
-        user.programs = updatedUserPrograms;
-        await user.save();
+        if (updatedUserPrograms.length > 0) {
+            user.programs = updatedUserPrograms;
+            await user.save();
+            console.log("User programs updated and saved");
+        }
+        else {
+            console.log("No active or upcoming programs found. User programs not updated.");
+        }
         res.status(200).json({
             success: true,
             activeProgram: activeProgram,
-            upcomingPrograms: upcomingPrograms
+            upcomingPrograms: upcomingPrograms,
+            totalPrograms: user.programs.length
         });
     }
     catch (error) {

@@ -42,7 +42,7 @@ const userSchema = new mongoose_1.default.Schema({
         default: false,
     },
     programs: [{
-            programId: { type: String, ref: 'Program' },
+            programId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Program' },
             purchasedDay: { type: Date, default: Date.now },
             startDate: { type: Date }
         }]

@@ -7,7 +7,7 @@ exports.newPayment = exports.sendStripePublishableKey = exports.createMobileOrde
 const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
 const ErrorHandler_1 = __importDefault(require("../utils/ErrorHandler"));
 const user_model_1 = __importDefault(require("../models/user.model"));
-const subscription_Model_1 = __importDefault(require("../models/subscription.Model"));
+const subscription_model_1 = __importDefault(require("../models/subscription.model"));
 const path_1 = __importDefault(require("path"));
 const ejs_1 = __importDefault(require("ejs"));
 const sendMail_1 = __importDefault(require("../utils/sendMail"));
@@ -30,7 +30,7 @@ exports.createMobileOrder = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, 
         //     new ErrorHandler("You have already purchased this course", 400)
         //   );
         // }
-        const subscription = await subscription_Model_1.default.findById(subscriptionId);
+        const subscription = await subscription_model_1.default.findById(subscriptionId);
         if (!subscription) {
             return next(new ErrorHandler_1.default("Subscription not found", 404));
         }

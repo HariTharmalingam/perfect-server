@@ -12,7 +12,7 @@ const error_1 = require("./middleware/error");
 const user_route_1 = __importDefault(require("./routes/user.route"));
 const layout_route_1 = __importDefault(require("./routes/layout.route"));
 const program_route_1 = __importDefault(require("./routes/program.route"));
-const order_route_1 = __importDefault(require("./routes/order.route"));
+const subscription_route_1 = __importDefault(require("./routes/subscription.route"));
 const notification_route_1 = __importDefault(require("./routes/notification.route"));
 const express_rate_limit_1 = require("express-rate-limit");
 // body parser
@@ -27,7 +27,7 @@ const limiter = (0, express_rate_limit_1.rateLimit)({
     legacyHeaders: false,
 });
 // routes
-exports.app.use("/api", user_route_1.default, layout_route_1.default, program_route_1.default, order_route_1.default, notification_route_1.default);
+exports.app.use("/api", user_route_1.default, layout_route_1.default, program_route_1.default, notification_route_1.default, subscription_route_1.default);
 // testing api
 exports.app.get("/test", (req, res, next) => {
     res.status(200).json({

@@ -7,7 +7,6 @@ import { ErrorMiddleware } from "./middleware/error";
 import userRouter from "./routes/user.route";
 import layoutRouter from "./routes/layout.route";
 import programRouter from "./routes/program.route";
-import orderRouter from "./routes/order.route";
 import subscriptionRouter from "./routes/subscription.route";
 import notificationRouter from "./routes/notification.route";
 
@@ -19,6 +18,14 @@ app.use(express.json({ limit: "50mb" }));
 // cookie parser
 app.use(cookieParser());
 
+app.use(
+  cors({
+    origin: "*", // Autorise toutes les origines
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 // api requests limit
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -26,15 +33,18 @@ const limiter = rateLimit({
   standardHeaders: "draft-7",
   legacyHeaders: false,
 });
-
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
 // routes
 app.use(
   "/api",
   userRouter,
   layoutRouter,
   programRouter,
-  orderRouter,
-  notificationRouter
+  notificationRouter,
+  subscriptionRouter
 );
 
 // testing api

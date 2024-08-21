@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-interface IImage {
+export interface IImage {
   public_id: string;
   url: string;
 }
@@ -13,14 +13,14 @@ interface IWeek {
   distance?: string[];
 }
 
-interface IExercise {
+export interface IExercise {
   name: string;
   instructions: string[];
   image: IImage;
   week: IWeek[];
 }
 
-interface ISession {
+export interface ISession {
   warmupId:  string;
   instructions: string;
   exercise: IExercise[];

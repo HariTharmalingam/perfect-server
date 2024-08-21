@@ -9,6 +9,7 @@ const program_model_1 = __importDefault(require("../models/program.model"));
 const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
 const moment_1 = __importDefault(require("moment"));
 const warmup_model_1 = require("../models/warmup.model");
+const mongoose_1 = __importDefault(require("mongoose"));
 // create program
 exports.createProgram = (0, catchAsyncErrors_1.CatchAsyncError)(async (data, res) => {
     const program = await program_model_1.default.create(data);
@@ -35,40 +36,40 @@ async function restructureProgram(program, startDate) {
     for (const month of program.month) {
         for (const session of month.session) {
             const weeksInSession = session.exercise[0]?.week.length || 0;
+            // Traitement du warmup pour cette session
+            let restructuredWarmup = null;
+            if (session.warmupId && mongoose_1.default.Types.ObjectId.isValid(session.warmupId)) {
+                const warmup = await warmup_model_1.Warmup.findById(session.warmupId);
+                if (warmup) {
+                    restructuredWarmup = {
+                        name: warmup.name,
+                        exercise: warmup.exercise.map(ex => ({
+                            name: ex.name,
+                            instructions: ex.instructions,
+                            image: ex.image,
+                            duration: ex.duration
+                        }))
+                    };
+                }
+            }
             for (let weekIndex = 0; weekIndex < weeksInSession; weekIndex++) {
                 globalWeekIndex++;
                 if (globalWeekIndex <= currentProgramWeek) {
-                    const restructuredWeek = {
-                        weekNumber: globalWeekIndex,
-                        isCurrent: globalWeekIndex === currentProgramWeek,
-                        sessions: []
-                    };
-                    let restructuredWarmup = null;
-                    if (session.warmupId) {
-                        let warmup = null;
-                        if (typeof session.warmupId === 'string') {
-                            warmup = await warmup_model_1.Warmup.findById(session.warmupId).lean();
-                        }
-                        else {
-                            warmup = session.warmupId;
-                        }
-                        if (warmup) {
-                            restructuredWarmup = {
-                                name: warmup.name,
-                                exercise: warmup.exercise.map(ex => ({
-                                    name: ex.name,
-                                    instructions: ex.instructions,
-                                    image: ex.image,
-                                    duration: ex.duration
-                                }))
-                            };
-                        }
+                    let restructuredWeek = restructuredWeeks.find(w => w.weekNumber === globalWeekIndex);
+                    if (!restructuredWeek) {
+                        restructuredWeek = {
+                            weekNumber: globalWeekIndex,
+                            isCurrent: globalWeekIndex === currentProgramWeek,
+                            sessions: []
+                        };
+                        restructuredWeeks.push(restructuredWeek);
                     }
                     const restructuredSession = {
                         warmup: restructuredWarmup,
                         instructions: session.instructions,
                         exercises: []
                     };
+                    // Traitement des exercices pour cette semaine
                     for (const exercise of session.exercise) {
                         if (weekIndex < exercise.week.length) {
                             const weekData = exercise.week[weekIndex];
@@ -86,7 +87,6 @@ async function restructureProgram(program, startDate) {
                         }
                     }
                     restructuredWeek.sessions.push(restructuredSession);
-                    restructuredWeeks.push(restructuredWeek);
                 }
             }
         }

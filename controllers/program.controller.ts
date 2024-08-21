@@ -42,11 +42,10 @@ export const getProgramsByUser = CatchAsyncError(
           model: Warmup
         }
       });
-
       if (!user) {
         return next(new ErrorHandler("User not found", 404));
       }
-
+      
       const currentDate = moment();
       let activeProgram = null;
       const upcomingPrograms = [];
@@ -54,22 +53,22 @@ export const getProgramsByUser = CatchAsyncError(
 
       for (let i = 0; i < user.programs.length; i++) {
         const userProgram = user.programs[i];
-        
-        // Vérification de type et conversion
+      
         if (!(userProgram.programId instanceof mongoose.Types.ObjectId) && 'name' in userProgram.programId) {
           const program = userProgram.programId as unknown as IProgram;
           const totalWeeks = program.month.reduce((acc, month) => acc + month.session[0].exercise[0].week.length, 0);
           const programEndDate = moment(userProgram.startDate).add(totalWeeks, 'weeks');
-
+      
           if (currentDate.isBefore(programEndDate)) {
             if (!activeProgram) {
               // C'est le premier programme actif
               const restructuredProgram = await restructureProgram(program, userProgram.startDate);
               activeProgram = {
-                ...program.toObject(),
-                restructuredWeeks: restructuredProgram,
+                _id: program._id,
+                name: program.name,
                 startDate: userProgram.startDate,
-                endDate: programEndDate.toDate()
+                endDate: programEndDate.toDate(),
+                restructuredWeeks: restructuredProgram
               };
               updatedUserPrograms.push(userProgram);
             } else {
@@ -81,25 +80,28 @@ export const getProgramsByUser = CatchAsyncError(
               });
               updatedUserPrograms.push(userProgram);
             }
-          } else if (i === 0) {
-            // Le premier programme est terminé, mettons à jour la date de début du suivant
-            if (user.programs[1]) {
-              user.programs[1].startDate = programEndDate.toDate();
-            }
+          } else {
+            console.log(`Program ${i} is completed and will be removed`);
           }
         } else {
           console.error('Invalid program data:', userProgram.programId);
         }
       }
 
-      // Mise à jour des programmes de l'utilisateur
-      user.programs = updatedUserPrograms;
-      await user.save();
+       // Mise à jour des programmes de l'utilisateur
+      if (updatedUserPrograms.length > 0) {
+        user.programs = updatedUserPrograms;
+        await user.save();
+        console.log("User programs updated and saved");
+      } else {
+        console.log("No active or upcoming programs found. User programs not updated.");
+      }     
 
       res.status(200).json({
         success: true,
         activeProgram: activeProgram,
-        upcomingPrograms: upcomingPrograms
+        upcomingPrograms: upcomingPrograms,
+        totalPrograms: user.programs.length
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));

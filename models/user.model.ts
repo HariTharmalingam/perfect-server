@@ -5,21 +5,24 @@ import jwt from "jsonwebtoken";
 
 const emailRegexPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export interface IUserProgram  {
-  programId: String,
+export interface IUserProgram {
+  programId: mongoose.Types.ObjectId;
   purchasedDay: Date;
   startDate: Date;
+  subscriptionEndDate?: Date;
+  isSubscription: boolean;
+  stripePriceId?: string;
 }
-
 export interface IUser extends Document {
   name: string;
   email: string;
+  stripeCustomerId?: string;
   password: string;
   avatar: {
     public_id: string;
     url: string;
   };
-  role: string;
+  role: 'user' | 'subscriber' | 'admin';
   isVerified: boolean;
   programs: IUserProgram[];
   createdAt: Date;
@@ -46,6 +49,9 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       },
       unique: true,
     },
+    stripeCustomerId: {
+      type: String,
+    },
     password: {
       type: String,
       minlength: [6, "Password must be at least 6 characters"],
@@ -55,18 +61,22 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       public_id: String,
       url: String,
     },
-    role: {
-      type: String,
-      default: "user",
+    role: { 
+      type: String, 
+      enum: ['user', 'subscriber', 'admin'], 
+      default: 'user' 
     },
     isVerified: {
       type: Boolean,
       default: false,
     },
     programs: [{
-      programId: { type: String, ref: 'Program' },
+      programId: { type: mongoose.Schema.Types.ObjectId, ref: 'Program' },
       purchasedDay: { type: Date, default: Date.now },
-      startDate: { type: Date }
+      startDate: { type: Date },
+      subscriptionEndDate: { type: Date },
+      isSubscription: { type: Boolean, default: false },
+      stripePriceId: { type: String }
     }]
   },
   { timestamps: true }
@@ -102,7 +112,8 @@ userSchema.methods.comparePassword = async function (
   return await bcrypt.compare(enteredPassword, this.password);
 };
 // Ajout d'un index pour améliorer les performances des requêtes
-userSchema.index({ programId: 1 });
+userSchema.index({ 'programs.programId': 1 });
+userSchema.index({ stripeCustomerId: 1 });
 
 const userModel: Model<IUser> = mongoose.model("User", userSchema);
 
